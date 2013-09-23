@@ -6,7 +6,7 @@ apply plugin: 'signing'
 version = '1.0-SNAPSHOT'
 group = 'de.felixschulze.gradle'
 
-ext.archivesBaseName = 'gradle-hockey-plugin'
+ext.archivesBaseName = 'gradle-hockeyapp-plugin'
 ext.isSnapshot = version.endsWith("-SNAPSHOT")
 
 repositories {
