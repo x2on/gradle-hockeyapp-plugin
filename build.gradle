@@ -1,0 +1,101 @@
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+version = '0.9-SNAPSHOT'
+group = 'de.felixschulze'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    groovy localGroovy()
+    compile gradleApi()
+    compile 'commons-io:commons-io:2.+'
+    compile 'commons-configuration:commons-configuration:1.8+'
+    compile 'org.apache.httpcomponents:httpclient:4.2+'
+    compile 'org.apache.httpcomponents:httpmime:4.2+'
+}
+
+
+task sourceJar(type: Jar) {
+    description = 'An archive of the source code for Maven Central'
+    classifier = 'sources'
+    from sourceSets.main.groovy
+}
+
+task groovydocJar(type: Jar) {
+    description = 'An archive of the GroovyDocs for Maven Central'
+    classifier = 'javadoc'
+    from groovydoc
+}
+
+artifacts {
+    archives groovydocJar, sourceJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+// Only *require* signing if we are uploading a non snapshot version
+gradle.taskGraph.whenReady { taskGraph ->
+    tasks.withType(org.gradle.plugins.signing.Sign).all {
+        required = taskGraph.hasTask(":uploadArchives") && !isSnapshot
+    }
+}
+
+install.repositories.mavenInstaller {
+    pom.project(pomConfiguration)
+    if (signing.signatory) {
+        beforeDeployment { signing.signPom(it) }
+    }
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        if (signing.signatory) {
+            beforeDeployment { signPom(it) }
+        }
+        name = 'mavenCentralReleaseDeployer'
+        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+            authentication(userName: System.properties['mavenCentralUsername'], password: System.properties['mavenCentralPassword'])
+            releases(updatePolicy: 'always')
+            snapshots(updatePolicy: 'always')
+        }
+        pom.project(pomConfiguration)
+    }
+}
+
+/**v
+ * Create POM config and return for use by other tasks.
+ */
+def getPomConfiguration() {
+    return {
+        name 'Gradle HockeyApp Plugin'
+        packaging 'jar'
+        description 'A Gradle plugin for uploading iOS and Android Apps to HockeyApp.'
+        url 'https://github.com/x2on/gradle-hockeyapp-plugin'
+        licenses {
+            license {
+                name 'The MIT License'
+                url 'http://www.opensource.org/licenses/mit-license.php'
+                distribution 'repo'
+            }
+        }
+        developers {
+            developer {
+                id 'x2on'
+                name 'Felix Schulze'
+                email 'code@felixschulze.de'
+            }
+        }
+        scm {
+            connection 'scm:https://x2on@github.com/x2on/gradle-hockeyapp-plugin'
+            developerConnection 'scm:git@github.com:x2on/gradle-hockeyapp-plugin.git'
+            url 'https://github.com/x2on/gradle-hockeyapp-plugin'
+        }
+    }
+}
