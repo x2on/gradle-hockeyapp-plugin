@@ -15,6 +15,7 @@ apply plugin: 'hockeyApp'
 hockeyapp {
 	apiToken = "123"
 	outputDirectory = "target"
+    symbolsDirectory = "target/symbols"
     releaseType = 2
     appFileNameRegex = "app.ipa"
     mappingFileNameRegex = "app.dSYM.zip"

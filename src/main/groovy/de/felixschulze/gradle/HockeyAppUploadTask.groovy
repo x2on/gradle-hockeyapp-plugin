@@ -53,8 +53,8 @@ class HockeyAppUploadTask extends DefaultTask {
             throw new IllegalArgumentException("Cannot upload to HockeyApp because API Token is missing")
         }
 
-        def appFile = getFile(project.hockeyapp.appFileNameRegex);
-        def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex);
+        def appFile = getFile(project.hockeyapp.appFileNameRegex, project.hockeyapp.outputDirectory);
+        def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, project.hockeyapp.symbolsDirectory);
 
         if (appFile == null) {
             throw new IllegalStateException("No app file with regex " + regex + " found in directory " + project.hockeyapp.outputDirectory.absolutePath)
@@ -109,21 +109,21 @@ class HockeyAppUploadTask extends DefaultTask {
         }
     }
 
-    def getFile(String regex) {
+    def getFile(String regex, File directory) {
         def pattern = Pattern.compile(regex)
 
-        if (!project.hockeyapp.outputDirectory.exists()) {
+        if (!directory.exists()) {
             throw new IllegalStateException("OutputDirectory not found")
         }
 
-        def fileList = project.hockeyapp.outputDirectory.list(
+        def fileList = directory.list(
                 [accept: { d, f -> f ==~ pattern }] as FilenameFilter
         ).toList()
 
         if (fileList == null || fileList.size() == 0) {
             return null
         }
-        return new File(project.hockeyapp.outputDirectory, fileList[0])
+        return new File(directory, fileList[0])
     }
 
 
