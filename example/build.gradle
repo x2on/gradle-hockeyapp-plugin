@@ -6,7 +6,7 @@ buildscript {
    	 mavenCentral()
 	}
 	dependencies {
-		classpath group: 'de.felixschulze', name: 'hockeyApp', version: '0.9-SNAPSHOT'
+		classpath group: 'de.felixschulze', name: 'hockeyApp', version: '1.0-SNAPSHOT'
 	}
 }
 
