@@ -3,7 +3,7 @@ apply plugin: 'idea'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-version = '0.9-SNAPSHOT'
+version = '0.9'
 group = 'de.felixschulze'
 
 repositories {
@@ -40,13 +40,6 @@ signing {
     sign configurations.archives
 }
 
-// Only *require* signing if we are uploading a non snapshot version
-gradle.taskGraph.whenReady { taskGraph ->
-    tasks.withType(org.gradle.plugins.signing.Sign).all {
-        required = taskGraph.hasTask(":uploadArchives") && !isSnapshot
-    }
-}
-
 install.repositories.mavenInstaller {
     pom.project(pomConfiguration)
     if (signing.signatory) {
@@ -61,7 +54,7 @@ uploadArchives {
         }
         name = 'mavenCentralReleaseDeployer'
         repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-            authentication(userName: System.properties['mavenCentralUsername'], password: System.properties['mavenCentralPassword'])
+            authentication(userName: sonatypeUsername, password: sonatypePassword)
             releases(updatePolicy: 'always')
             snapshots(updatePolicy: 'always')
         }
