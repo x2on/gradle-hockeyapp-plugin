@@ -4,7 +4,10 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 version = '1.0-SNAPSHOT'
-group = 'de.felixschulze'
+group = 'de.felixschulze.gradle'
+
+ext.archivesBaseName = 'gradle-hockey-plugin'
+ext.isSnapshot = version.endsWith("-SNAPSHOT")
 
 repositories {
     mavenCentral()

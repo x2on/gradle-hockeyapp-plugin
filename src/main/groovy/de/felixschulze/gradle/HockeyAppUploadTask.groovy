@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze
+package de.felixschulze.gradle
 
 import org.apache.http.HttpHost
 import org.apache.http.HttpResponse

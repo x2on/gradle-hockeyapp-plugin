@@ -22,36 +22,32 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze
+package de.felixschulze.gradle
 
+import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-class HockeyAppPluginExtension {
-    def Object outputDirectory
-    def String apiToken = null
-    def String notes = "This build was uploaded using the gradle-hockeyapp-plugin"
-    def String status = 2
-    def String notify = 0
-    def String notesType = 1
-    def String releaseType = 0
-    def String appFileNameRegex = ".*.ipa"
-    def String mappingFileNameRegex = ".*.dSYM.zip"
+class HockeyAppPlugin implements Plugin<Project> {
 
-    private final Project project
+    void apply(Project project) {
+        configureDependencies(project)
+        applyExtensions(project)
+        applyTasks(project)
+    }
 
-    public HockeyAppPluginExtension(Project project) {
-        this.project = project
-        this.outputDirectory = {
-            return project.project.getBuildDir()
+    void applyExtensions(final Project project) {
+        project.extensions.create('hockeyapp', HockeyAppPluginExtension, project)
+    }
+
+    void applyTasks(final Project project) {
+        project.task('hockeyapp', type: HockeyAppUploadTask, group: 'HockeyApp')
+    }
+
+
+    void configureDependencies(final Project project) {
+        project.repositories {
+            mavenCentral()
         }
-    }
-
-    File getOutputDirectory() {
-        return project.file(outputDirectory)
-    }
-
-    void setOutputDirectory(Object outputDirectory) {
-        this.outputDirectory = outputDirectory
     }
 
 }
