@@ -54,7 +54,7 @@ uploadArchives {
         }
         name = 'mavenCentralReleaseDeployer'
         repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-            authentication(userName: sonatypeUsername, password: sonatypePassword)
+            authentication(userName: System.properties['sonatypeUsername'], password: System.properties['sonatypePassword'])
             releases(updatePolicy: 'always')
             snapshots(updatePolicy: 'always')
         }
