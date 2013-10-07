@@ -24,8 +24,11 @@
 
 package de.felixschulze.gradle
 
+import com.android.build.gradle.api.ApplicationVariant
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.AppPlugin
 
 class HockeyAppPlugin implements Plugin<Project> {
 
@@ -40,7 +43,22 @@ class HockeyAppPlugin implements Plugin<Project> {
     }
 
     void applyTasks(final Project project) {
-        project.task('hockeyapp', type: HockeyAppUploadTask, group: 'HockeyApp')
+
+        if (!project.plugins.hasPlugin(AppPlugin)) {
+            project.task('uploadToHockeyApp', type: HockeyAppUploadTask, group: 'HockeyApp')
+        } else {
+            AppExtension android = project.android
+            android.applicationVariants.all { ApplicationVariant variant ->
+
+                HockeyAppUploadTask task = project.tasks.create("upload${variant.name}ToHockeyApp", HockeyAppUploadTask)
+                task.group = 'HockeyApp'
+                task.description = "Upload '${variant.name}' to HockeyApp"
+                task.applicationApk = variant.packageApplication.outputFile
+                task.outputs.upToDateWhen { false }
+
+                task.dependsOn variant.assemble
+            }
+        }
     }
 
 
