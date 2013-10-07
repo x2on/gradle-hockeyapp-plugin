@@ -40,6 +40,8 @@ import java.util.regex.Pattern
 
 class HockeyAppUploadTask extends DefaultTask {
 
+    File applicationApk
+
     HockeyAppUploadTask() {
         super()
         this.description = "Uploades the app (.ipa, .dsym, .apk) to HockeyApp"
@@ -53,14 +55,17 @@ class HockeyAppUploadTask extends DefaultTask {
             throw new IllegalArgumentException("Cannot upload to HockeyApp because API Token is missing")
         }
 
-        def appFile = getFile(project.hockeyapp.appFileNameRegex, project.hockeyapp.outputDirectory);
+        if (!applicationApk.exists()) {
+            applicationApk = getFile(project.hockeyapp.appFileNameRegex, project.hockeyapp.outputDirectory);
+            if (applicationApk == null) {
+                throw new IllegalStateException("No app file with regex " + regex + " found in directory " + project.hockeyapp.outputDirectory.absolutePath)
+            }
+        }
         def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, project.hockeyapp.symbolsDirectory);
 
-        if (appFile == null) {
-            throw new IllegalStateException("No app file with regex " + regex + " found in directory " + project.hockeyapp.outputDirectory.absolutePath)
-        }
 
-        println "App file: " + appFile.absolutePath
+
+        println "App file: " + applicationApk.absolutePath
         if (mappingFile) {
             println "Mapping file: " + mappingFile.absolutePath
         }
@@ -68,7 +73,7 @@ class HockeyAppUploadTask extends DefaultTask {
             println "WARNING: No Mapping file found."
         }
 
-        uploadApp(appFile, mappingFile)
+        uploadApp(applicationApk, mappingFile)
     }
 
     def void uploadApp(File appFile, File mappingFile) {
