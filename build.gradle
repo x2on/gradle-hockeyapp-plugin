@@ -1,9 +1,18 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.townsfolk:gradle-release:1.2'
+    }
+}
+
 apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'release'
 
-version = '1.0-SNAPSHOT'
 group = 'de.felixschulze.gradle'
 
 ext.archivesBaseName = 'gradle-hockeyapp-plugin'
@@ -71,6 +80,10 @@ uploadArchives {
         }
         pom.project(pomConfiguration)
     }
+}
+
+release {
+    createReleaseTag.dependsOn uploadArchives
 }
 
 /**v
