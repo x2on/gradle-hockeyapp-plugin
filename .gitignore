@@ -3,3 +3,6 @@
 *.iws
 .gradle
 example/target
+
+#Intellij
+/.idea/
