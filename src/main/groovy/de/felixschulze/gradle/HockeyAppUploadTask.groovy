@@ -80,8 +80,13 @@ class HockeyAppUploadTask extends DefaultTask {
         HttpClient httpClient = new DefaultHttpClient()
 
         String proxyHost = System.getProperty("http.proxyHost")
-        int proxyPort = System.getProperty("http.proxyPort") as int
-        if (proxyHost.length() > 0 && proxyPort > 0) {
+
+        int proxyPort;
+        String proxyPortString = System.getProperty("http.proxyPort");
+        if(proxyPortString != null) {
+            proxyPort = proxyPortString int;
+        }
+        if ((proxyHost == null || proxyHost.length() > 0) && proxyPort > 0) {
             println "Using proxy: " + proxyHost + ":" + proxyPort
             HttpHost proxy = new HttpHost(proxyHost, proxyPort);
             httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);

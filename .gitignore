@@ -3,3 +3,8 @@
 *.iws
 .gradle
 example/target
+
+/build/
+
+#Intellij
+/.idea/
