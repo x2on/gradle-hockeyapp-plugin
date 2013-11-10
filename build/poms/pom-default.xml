@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.felixschulze.gradle</groupId>
+  <artifactId>gradle-hockeyapp-plugin</artifactId>
+  <version>1.1-SNAPSHOT</version>
+  <name>Gradle HockeyApp Plugin</name>
+  <description>A Gradle plugin for uploading iOS and Android Apps to HockeyApp.</description>
+  <url>https://github.com/x2on/gradle-hockeyapp-plugin</url>
+  <licenses>
+    <license>
+      <name>The MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>x2on</id>
+      <name>Felix Schulze</name>
+      <email>code@felixschulze.de</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:https://x2on@github.com/x2on/gradle-hockeyapp-plugin</connection>
+    <developerConnection>scm:git@github.com:x2on/gradle-hockeyapp-plugin.git</developerConnection>
+    <url>https://github.com/x2on/gradle-hockeyapp-plugin</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.2+</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
+      <version>1.8+</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.android.tools.build</groupId>
+      <artifactId>gradle</artifactId>
+      <version>0.5.+</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.+</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <version>4.2+</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>
