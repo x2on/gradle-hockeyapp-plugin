@@ -79,8 +79,8 @@ class HockeyAppUploadTask extends DefaultTask {
     def void uploadApp(File appFile, File mappingFile) {
         HttpClient httpClient = new DefaultHttpClient()
 
-        String proxyHost = System.getProperty("http.proxyHost")
-        int proxyPort = System.getProperty("http.proxyPort") as int
+        String proxyHost = System.getProperty("http.proxyHost", "")
+        int proxyPort = System.getProperty("http.proxyPort", "0") as int
         if (proxyHost.length() > 0 && proxyPort > 0) {
             println "Using proxy: " + proxyHost + ":" + proxyPort
             HttpHost proxy = new HttpHost(proxyHost, proxyPort);
