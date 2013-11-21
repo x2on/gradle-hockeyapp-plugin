@@ -15,7 +15,7 @@ buildscript {
     }
 }
 
-apply plugin: 'hockeyapp'
+apply plugin: 'hockeyApp'
 ```
 
 ## Advanced usage
@@ -38,10 +38,10 @@ hockeyapp {
 * `appFileNameRegex`: Only needed for iOS
 * `outputDirectory`: Only needed for iOS
 * `apiToken`: Your API Token from [HockeyApp](http://hockeyapp.net/)
-* `releaseType`: `0` live, `1` beta, `2` alpha
+* `releaseType`: `0` beta, `1` live, `2` alpha
 * `notify`: `0` not notify testers, `1` notify all testers that can install this app
 * `status`: `1` not allow users to download the version, `2` make the version available for download
-* `status`: `0` Textile, `1` Markdown
+* `notesType`: `0` Textile, `1` Markdown
 * `notes`: optional, release notes as Textile or Markdown
 * `symbolsDirectory`: `file("directory")`
 * `mappingFileNameRegex`:  `mappingFileNameRegex= "R.txt"`
