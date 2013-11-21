@@ -15,7 +15,7 @@ buildscript {
     }
 }
 
-apply plugin: 'hockeyapp'
+apply plugin: 'hockeyApp'
 ```
 
 ## Advanced usage
