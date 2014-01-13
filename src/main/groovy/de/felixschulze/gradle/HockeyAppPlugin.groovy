@@ -53,7 +53,7 @@ class HockeyAppPlugin implements Plugin<Project> {
                 HockeyAppUploadTask task = project.tasks.create("upload${variant.name}ToHockeyApp", HockeyAppUploadTask)
                 task.group = 'HockeyApp'
                 task.description = "Upload '${variant.name}' to HockeyApp"
-                task.applicationApk = variant.packageApplication.outputFile
+                task.applicationApk = variant.outputFile
                 task.outputs.upToDateWhen { false }
 
                 task.dependsOn variant.assemble
