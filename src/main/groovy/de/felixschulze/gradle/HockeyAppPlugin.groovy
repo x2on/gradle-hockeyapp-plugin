@@ -50,7 +50,7 @@ class HockeyAppPlugin implements Plugin<Project> {
             AppExtension android = project.android
             android.applicationVariants.all { ApplicationVariant variant ->
 
-                HockeyAppUploadTask task = project.tasks.create("upload${variant.name}ToHockeyApp", HockeyAppUploadTask)
+                HockeyAppUploadTask task = project.tasks.create("upload${variant.name.capitalize()}ToHockeyApp", HockeyAppUploadTask)
                 task.group = 'HockeyApp'
                 task.description = "Upload '${variant.name}' to HockeyApp"
                 task.applicationApk = variant.outputFile
