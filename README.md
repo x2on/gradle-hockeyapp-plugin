@@ -49,7 +49,7 @@ hockeyapp {
 * `notes`: optional, release notes as Textile or Markdown
 * `symbolsDirectory`: `file("directory")`
 * `mappingFileNameRegex`:  `mappingFileNameRegex= "R.txt"`
-* `variantToApplicationId`:  `variantName: "appId" map between your variant and application ID`
+* `variantToApplicationId`:  Optional: `[variantName: "appId"]` map between your variant and application ID
 
 ## Changelog
 
