@@ -91,7 +91,6 @@ class HockeyAppUploadTask extends DefaultTask {
 
         def uploadUrl = "https://rink.hockeyapp.net/api/2/apps"
         if (appId != null) {
-            println " App ID: ${appId}"
             uploadUrl = "https://rink.hockeyapp.net/api/2/apps/${appId}/app_versions/upload"
         }
 
