@@ -73,7 +73,12 @@ class HockeyAppUploadTask extends DefaultTask {
             println "WARNING: No Mapping file found."
         }
 
-        def appId = project.hockeyapp.variantToApplicationId[variantName]
+        def appId = null
+        if (project.hockeyapp.variantToApplicationId != null) {
+            appId = project.hockeyapp.variantToApplicationId[variantName]
+            if (appId == null)
+                throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
+        }
 
         uploadApp(applicationApk, mappingFile, appId)
     }
