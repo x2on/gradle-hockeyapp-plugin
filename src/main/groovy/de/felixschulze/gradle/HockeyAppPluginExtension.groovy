@@ -37,6 +37,7 @@ class HockeyAppPluginExtension {
     def String releaseType = 0
     def String appFileNameRegex = ".*.ipa"
     def String mappingFileNameRegex = ".*.dSYM.zip"
+    def Map<String, Object> variantToApplicationId = null
 
     private final Project project
 
