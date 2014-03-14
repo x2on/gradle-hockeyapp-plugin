@@ -73,7 +73,7 @@ class HockeyAppUploadTask extends DefaultTask {
             println "WARNING: No Mapping file found."
         }
 
-        def appId = null
+        String appId = null
         if (project.hockeyapp.variantToApplicationId != null) {
             appId = project.hockeyapp.variantToApplicationId[variantName]
             if (appId == null)
@@ -94,7 +94,7 @@ class HockeyAppUploadTask extends DefaultTask {
             httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
         }
 
-        def uploadUrl = "https://rink.hockeyapp.net/api/2/apps"
+        String uploadUrl = "https://rink.hockeyapp.net/api/2/apps"
         if (appId != null) {
             uploadUrl = "https://rink.hockeyapp.net/api/2/apps/${appId}/app_versions/upload"
         }
