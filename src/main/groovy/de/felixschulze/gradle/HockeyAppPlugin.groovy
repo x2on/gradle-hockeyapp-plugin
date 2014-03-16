@@ -54,6 +54,7 @@ class HockeyAppPlugin implements Plugin<Project> {
                 task.group = 'HockeyApp'
                 task.description = "Upload '${variant.name}' to HockeyApp"
                 task.applicationApk = variant.outputFile
+                task.variantName = variant.name
                 task.outputs.upToDateWhen { false }
 
                 task.dependsOn variant.assemble

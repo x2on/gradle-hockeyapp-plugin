@@ -41,6 +41,7 @@ import java.util.regex.Pattern
 class HockeyAppUploadTask extends DefaultTask {
 
     File applicationApk
+    String variantName
 
     HockeyAppUploadTask() {
         super()
@@ -64,7 +65,6 @@ class HockeyAppUploadTask extends DefaultTask {
         def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, project.hockeyapp.symbolsDirectory);
 
 
-
         println "App file: " + applicationApk.absolutePath
         if (mappingFile) {
             println "Mapping file: " + mappingFile.absolutePath
@@ -73,10 +73,17 @@ class HockeyAppUploadTask extends DefaultTask {
             println "WARNING: No Mapping file found."
         }
 
-        uploadApp(applicationApk, mappingFile)
+        String appId = null
+        if (project.hockeyapp.variantToApplicationId != null) {
+            appId = project.hockeyapp.variantToApplicationId[variantName]
+            if (appId == null)
+                throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
+        }
+
+        uploadApp(applicationApk, mappingFile, appId)
     }
 
-    def void uploadApp(File appFile, File mappingFile) {
+    def void uploadApp(File appFile, File mappingFile, String appId) {
         HttpClient httpClient = new DefaultHttpClient()
 
         String proxyHost = System.getProperty("http.proxyHost", "")
@@ -87,7 +94,13 @@ class HockeyAppUploadTask extends DefaultTask {
             httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
         }
 
-        HttpPost httpPost = new HttpPost("https://rink.hockeyapp.net/api/2/apps")
+        String uploadUrl = "https://rink.hockeyapp.net/api/2/apps"
+        if (appId != null) {
+            uploadUrl = "https://rink.hockeyapp.net/api/2/apps/${appId}/app_versions/upload"
+        }
+
+        HttpPost httpPost = new HttpPost(uploadUrl)
+        println "Will upload to: ${uploadUrl}"
 
         MultipartEntity entity = new MultipartEntity();
 

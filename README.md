@@ -32,6 +32,10 @@ hockeyapp {
     notes = "Some notes."
     symbolsDirectory = file("build/symbols/")
     mappingFileNameRegex = "R.txt"
+    variantToApplicationId = [
+            BuildVariantA:  "applicationIdA",
+            BuildVariantB:  "applicationIdB",
+    ]
 }
 
 ```
@@ -45,6 +49,7 @@ hockeyapp {
 * `notes`: optional, release notes as Textile or Markdown
 * `symbolsDirectory`: `file("directory")`
 * `mappingFileNameRegex`:  `mappingFileNameRegex= "R.txt"`
+* `variantToApplicationId`:  Optional: `[variantName: "appId"]` map between your variant and application ID
 
 ## Changelog
 
