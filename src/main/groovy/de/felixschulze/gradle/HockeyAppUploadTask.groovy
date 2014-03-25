@@ -24,6 +24,7 @@
 
 package de.felixschulze.gradle
 
+import groovy.json.JsonSlurper
 import org.apache.http.HttpHost
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -113,6 +114,7 @@ class HockeyAppUploadTask extends DefaultTask {
         entity.addPart("notify", new StringBody(project.hockeyapp.notify))
         entity.addPart("status", new StringBody(project.hockeyapp.status))
         entity.addPart("release_type", new StringBody(project.hockeyapp.releaseType))
+        decorateWithOptionalProperties(entity)
 
         httpPost.addHeader("X-HockeyAppToken", project.hockeyapp.apiToken)
 
@@ -124,6 +126,32 @@ class HockeyAppUploadTask extends DefaultTask {
 
         if (response.getStatusLine().getStatusCode() != 201) {
             throw new IllegalStateException("File upload failed: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
+        }
+        else {
+            InputStreamReader reader = new InputStreamReader(response.getEntity().content)
+            def root = new JsonSlurper().parse(reader)
+            reader.close()
+
+            println "Application uploaded successfully: " + root
+            println " - title:         " + root.title
+            println " - version:       " + root.version
+            println " - short version: " + root.shortversion
+            println " - public URL:    " + root.public_url
+        }
+    }
+
+    private void decorateWithOptionalProperties(MultipartEntity entity) {
+        if (project.hockeyapp.commitSha) {
+            entity.addPart("commit_sha", new StringBody(project.hockeyapp.commitSha))
+            println " - commit_sha: " + project.hockeyapp.commitSha
+        }
+        if (project.hockeyapp.buildServerUrl) {
+            entity.addPart("build_server_url", new StringBody(project.hockeyapp.buildServerUrl))
+            println " - build_server_url: " + project.hockeyapp.buildServerUrl
+        }
+        if (project.hockeyapp.repositoryUrl) {
+            entity.addPart("repository_url", new StringBody(project.hockeyapp.repositoryUrl))
+            println " - repository_url: " + project.hockeyapp.repositoryUrl
         }
     }
 

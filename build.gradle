@@ -73,10 +73,8 @@ uploadArchives {
             beforeDeployment { signPom(it) }
         }
         name = 'mavenCentralReleaseDeployer'
-        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-            authentication(userName: System.properties['sonatypeUsername'], password: System.properties['sonatypePassword'])
-            releases(updatePolicy: 'always')
-            snapshots(updatePolicy: 'always')
+        repository(url: "http://iheart.artifactoryonline.com/iheart/external") {
+            authentication(userName: artifactoryUsername, password: artifactoryPassword)
         }
         pom.project(pomConfiguration)
     }
@@ -107,6 +105,11 @@ def getPomConfiguration() {
                 id 'x2on'
                 name 'Felix Schulze'
                 email 'code@felixschulze.de'
+            }
+            developer {
+                id 'sveinungkb'
+                name 'Sveinung Kval Bakken'
+                email 'sveinung.bakken@gmail.com'
             }
         }
         scm {
