@@ -19,6 +19,9 @@ hockeyapp {
     releaseType = 2
     appFileNameRegex = "app.ipa"
     mappingFileNameRegex = "app.dSYM.zip"
+    commitSha = 'abdef'
+    buildServerUrl = null
+    repositoryUrl = null
     variantToApplicationId = [
             ProductionRelease:  "abdefhgohofjkfaca2789609137402f9",
             ProductionDebug:    "abcdefghjiklmnof21296a9d592a60ea",
