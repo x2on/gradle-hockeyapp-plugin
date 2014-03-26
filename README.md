@@ -39,17 +39,20 @@ hockeyapp {
 }
 
 ```
-* `appFileNameRegex`: Only needed for iOS
-* `outputDirectory`: Only needed for iOS
+### Required
 * `apiToken`: Your API Token from [HockeyApp](http://hockeyapp.net/)
+
+### Optional
 * `releaseType`: `0` beta, `1` live, `2` alpha
 * `notify`: `0` not notify testers, `1` notify all testers that can install this app
 * `status`: `1` not allow users to download the version, `2` make the version available for download
+* `notes`: Release notes as Textile or Markdown
 * `notesType`: `0` Textile, `1` Markdown
-* `notes`: optional, release notes as Textile or Markdown
-* `symbolsDirectory`: `file("directory")`
-* `mappingFileNameRegex`:  `mappingFileNameRegex= "R.txt"`
-* `variantToApplicationId`:  Optional: `[variantName: "appId"]` map between your variant and application ID
+* `symbolsDirectory`: Optional: `file("directory")` Directory which contains the `R` file (Android) or `dSYM` file (iOS)
+* `mappingFileNameRegex`:  Optional: `mappingFileNameRegex= "R.txt"` Should contain the filename or a regex for the `R` mapping file (Android) or `dSYM` file (iOS)
+* `variantToApplicationId`:  Optional (Android): `[variantName: "appId"]` map between your variant and application ID
+* `appFileNameRegex`: Only needed for iOS or if you dont use the android gradle plugin
+* `outputDirectory`: Only needed for iOS
 
 ## Changelog
 
