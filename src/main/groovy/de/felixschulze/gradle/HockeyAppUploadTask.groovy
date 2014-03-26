@@ -115,7 +115,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
         httpPost.setEntity(entity);
 
-        println "Request: " + httpPost.getRequestLine().toString()
+        logger.info("Request: " + httpPost.getRequestLine().toString())
 
         HttpResponse response = httpClient.execute(httpPost)
 
@@ -123,12 +123,13 @@ class HockeyAppUploadTask extends DefaultTask {
             throw new IllegalStateException("File upload failed: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
         }
         else {
+            println "Application uploaded successfully."
             InputStreamReader reader = new InputStreamReader(response.getEntity().content)
             def root = new JsonSlurper().parse(reader)
             reader.close()
 
-            logger.info("Application uploaded successfully: " + root.title + "v" + root.shortversion + "(" + root.version + ")");
-            logger.debug(" - public URL:    " + root.public_url)
+            logger.info(" hockey application: " + root.title + " v" + root.shortversion + "(" + root.version + ")");
+            logger.debug(" upload response:\n" + root)
         }
     }
 
