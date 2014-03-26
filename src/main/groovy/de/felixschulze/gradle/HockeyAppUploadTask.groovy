@@ -101,7 +101,7 @@ class HockeyAppUploadTask extends DefaultTask {
         }
 
         HttpPost httpPost = new HttpPost(uploadUrl)
-        println "Will upload to: ${uploadUrl}"
+        logger.info("Will upload to: ${uploadUrl}")
 
         MultipartEntity entity = new MultipartEntity();
 
@@ -128,7 +128,7 @@ class HockeyAppUploadTask extends DefaultTask {
             def root = new JsonSlurper().parse(reader)
             reader.close()
 
-            logger.info(" hockey application: " + root.title + " v" + root.shortversion + "(" + root.version + ")");
+            logger.info(" application: " + root.title + " v" + root.shortversion + "(" + root.version + ")");
             logger.debug(" upload response:\n" + root)
         }
     }
