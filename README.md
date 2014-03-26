@@ -49,7 +49,11 @@ hockeyapp {
 * `notes`: optional, release notes as Textile or Markdown
 * `symbolsDirectory`: `file("directory")`
 * `mappingFileNameRegex`:  `mappingFileNameRegex= "R.txt"`
-* `variantToApplicationId`:  Optional: `[variantName: "appId"]` map between your variant and application ID
+* `variantToApplicationId`:  Optional: `[variantName: "appId", variantName2: "appId2"]` map between your variant and application IDs
+* `tags`: Optional: restrict download to comma-separated list of tags
+* `commitSha`: Optional: commit SHA for this build
+* `buildServerUrl`: Optional: the URL of the build job on your build server
+* `repositoryUrl`: Optional: your source repository URL
 
 ## Changelog
 

@@ -40,7 +40,7 @@ class HockeyAppPluginExtension {
     def String commitSha = null
     def String buildServerUrl = null
     def String repositoryUrl = null
-    def boolean privatePage = false
+    def String tags = null
     def Map<String, String> variantToApplicationId = null
 
     private final Project project

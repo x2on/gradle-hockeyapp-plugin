@@ -158,8 +158,8 @@ class HockeyAppUploadTask extends DefaultTask {
         if (project.hockeyapp.repositoryUrl) {
             entity.addPart("repository_url", new StringBody(project.hockeyapp.repositoryUrl))
         }
-        if (project.hockeyapp.privatePage) {
-            entity.addPart("private_page", new StringBody(Boolean.toString(project.hockeyapp.privatePage)))
+        if (project.hockeyapp.tags) {
+            entity.addPart("tags", new StringBody(project.hockeyapp.tags))
         }
     }
 
