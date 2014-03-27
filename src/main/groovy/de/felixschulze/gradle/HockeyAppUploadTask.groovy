@@ -125,11 +125,11 @@ class HockeyAppUploadTask extends DefaultTask {
         else {
             println "Application uploaded successfully."
             InputStreamReader reader = new InputStreamReader(response.getEntity().content)
-            def root = new JsonSlurper().parse(reader)
+            def uploadResponse = new JsonSlurper().parse(reader)
             reader.close()
 
-            logger.info(" application: " + root.title + " v" + root.shortversion + "(" + root.version + ")");
-            logger.debug(" upload response:\n" + root)
+            logger.info(" application: " + uploadResponse.title + " v" + uploadResponse.shortversion + "(" + uploadResponse.version + ")");
+            logger.debug(" upload response:\n" + uploadResponse)
         }
     }
 
