@@ -50,9 +50,13 @@ hockeyapp {
 * `notesType`: `0` Textile, `1` Markdown
 * `symbolsDirectory`: Optional: `file("directory")` Directory which contains the `R` file (Android) or `dSYM` file (iOS)
 * `mappingFileNameRegex`:  Optional: `mappingFileNameRegex= "R.txt"` Should contain the filename or a regex for the `R` mapping file (Android) or `dSYM` file (iOS)
-* `variantToApplicationId`:  Optional (Android): `[variantName: "appId"]` map between your variant and application ID
+* `variantToApplicationId`:  Optional (Android): `[variantName: "appId", variantName2: "appId2"]` map between your variants and application IDs
 * `appFileNameRegex`: Only needed for iOS or if you dont use the android gradle plugin
 * `outputDirectory`: Only needed for iOS
+* `tags`: Optional: restrict download to comma-separated list of tags
+* `commitSha`: Optional: commit SHA for this build
+* `buildServerUrl`: Optional: the URL of the build job on your build server
+* `repositoryUrl`: Optional: your source repository URL
 
 ## Changelog
 

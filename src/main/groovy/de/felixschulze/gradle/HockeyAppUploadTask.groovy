@@ -24,6 +24,7 @@
 
 package de.felixschulze.gradle
 
+import groovy.json.JsonSlurper
 import org.apache.http.HttpHost
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -100,7 +101,7 @@ class HockeyAppUploadTask extends DefaultTask {
         }
 
         HttpPost httpPost = new HttpPost(uploadUrl)
-        println "Will upload to: ${uploadUrl}"
+        logger.info("Will upload to: ${uploadUrl}")
 
         MultipartEntity entity = new MultipartEntity();
 
@@ -108,24 +109,60 @@ class HockeyAppUploadTask extends DefaultTask {
         if (mappingFile) {
             entity.addPart("dsym", new FileBody(mappingFile))
         }
-        entity.addPart("notes", new StringBody(project.hockeyapp.notes))
-        entity.addPart("notes_type", new StringBody(project.hockeyapp.notesType))
-        entity.addPart("notify", new StringBody(project.hockeyapp.notify))
-        entity.addPart("status", new StringBody(project.hockeyapp.status))
-        entity.addPart("release_type", new StringBody(project.hockeyapp.releaseType))
+        decorateWithOptionalProperties(entity)
 
         httpPost.addHeader("X-HockeyAppToken", project.hockeyapp.apiToken)
 
         httpPost.setEntity(entity);
 
-        println "Request: " + httpPost.getRequestLine().toString()
+        logger.info("Request: " + httpPost.getRequestLine().toString())
 
         HttpResponse response = httpClient.execute(httpPost)
 
         if (response.getStatusLine().getStatusCode() != 201) {
             throw new IllegalStateException("File upload failed: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
         }
+        else {
+            println "Application uploaded successfully."
+            InputStreamReader reader = new InputStreamReader(response.getEntity().content)
+            def root = new JsonSlurper().parse(reader)
+            reader.close()
+
+            logger.info(" application: " + root.title + " v" + root.shortversion + "(" + root.version + ")");
+            logger.debug(" upload response:\n" + root)
+        }
     }
+
+    private void decorateWithOptionalProperties(MultipartEntity entity) {
+        if (project.hockeyapp.notify) {
+            entity.addPart("notify", new StringBody(project.hockeyapp.notify))
+        }
+        if (project.hockeyapp.notesType) {
+            entity.addPart("notes_type", new StringBody(project.hockeyapp.notesType))
+        }
+        if (project.hockeyapp.notes) {
+            entity.addPart("notes", new StringBody(project.hockeyapp.notes))
+        }
+        if (project.hockeyapp.status) {
+            entity.addPart("status", new StringBody(project.hockeyapp.status))
+        }
+        if (project.hockeyapp.releaseType) {
+            entity.addPart("release_type", new StringBody(project.hockeyapp.releaseType))
+        }
+        if (project.hockeyapp.commitSha) {
+            entity.addPart("commit_sha", new StringBody(project.hockeyapp.commitSha))
+        }
+        if (project.hockeyapp.buildServerUrl) {
+            entity.addPart("build_server_url", new StringBody(project.hockeyapp.buildServerUrl))
+        }
+        if (project.hockeyapp.repositoryUrl) {
+            entity.addPart("repository_url", new StringBody(project.hockeyapp.repositoryUrl))
+        }
+        if (project.hockeyapp.tags) {
+            entity.addPart("tags", new StringBody(project.hockeyapp.tags))
+        }
+    }
+
 
     def getFile(String regex, File directory) {
         def pattern = Pattern.compile(regex)

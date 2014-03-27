@@ -19,6 +19,10 @@ hockeyapp {
     releaseType = 2
     appFileNameRegex = "app.ipa"
     mappingFileNameRegex = "app.dSYM.zip"
+    tags = "QA,internal,execs"
+    commitSha = "d670460b4b4aece5915caf5c68d12f560a9fe3e4"
+    buildServerUrl = 'http://ci.yourdomain.com/job123'
+    repositoryUrl = 'https://github.com/organization/your_repo/releases/tag/1.0.0'
     variantToApplicationId = [
             ProductionRelease:  "abdefhgohofjkfaca2789609137402f9",
             ProductionDebug:    "abcdefghjiklmnof21296a9d592a60ea",
