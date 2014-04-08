@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2013 Felix Schulze
+ * Copyright (c) 2013-2014 Felix Schulze
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,18 +24,22 @@
 
 package de.felixschulze.gradle
 
+import de.felixschulze.gradle.util.ProgressHttpEntityWrapper
 import groovy.json.JsonSlurper
+import org.apache.http.HttpEntity
 import org.apache.http.HttpHost
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
+import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpPost
-import org.apache.http.conn.params.ConnRoutePNames
-import org.apache.http.entity.mime.MultipartEntity
+import org.apache.http.entity.mime.MultipartEntityBuilder
 import org.apache.http.entity.mime.content.FileBody
 import org.apache.http.entity.mime.content.StringBody
-import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.impl.client.HttpClientBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
+import org.gradle.logging.ProgressLogger
+import org.gradle.logging.ProgressLoggerFactory
 
 import java.util.regex.Pattern
 
@@ -43,6 +47,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
     File applicationFile
     String variantName
+
 
     HockeyAppUploadTask() {
         super()
@@ -65,7 +70,6 @@ class HockeyAppUploadTask extends DefaultTask {
         }
         def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, project.hockeyapp.symbolsDirectory);
 
-
         println "App file: " + applicationFile.absolutePath
         if (mappingFile) {
             println "Mapping file: " + mappingFile.absolutePath
@@ -85,15 +89,25 @@ class HockeyAppUploadTask extends DefaultTask {
     }
 
     def void uploadApp(File appFile, File mappingFile, String appId) {
-        HttpClient httpClient = new DefaultHttpClient()
+
+        ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation(this.getClass())
+        progressLogger.start("Upload file to Hockey App", "Upload file")
+
+        RequestConfig.Builder requestBuilder = RequestConfig.custom()
+        requestBuilder = requestBuilder.setConnectTimeout(project.hockeyapp.timeout)
+        requestBuilder = requestBuilder.setConnectionRequestTimeout(project.hockeyapp.timeout)
 
         String proxyHost = System.getProperty("http.proxyHost", "")
         int proxyPort = System.getProperty("http.proxyPort", "0") as int
         if (proxyHost.length() > 0 && proxyPort > 0) {
             println "Using proxy: " + proxyHost + ":" + proxyPort
             HttpHost proxy = new HttpHost(proxyHost, proxyPort);
-            httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+            requestBuilder = requestBuilder.setProxy(proxy)
         }
+
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        builder.setDefaultRequestConfig(requestBuilder.build());
+        HttpClient httpClient = builder.build();
 
         String uploadUrl = "https://rink.hockeyapp.net/api/2/apps"
         if (appId != null) {
@@ -103,17 +117,34 @@ class HockeyAppUploadTask extends DefaultTask {
         HttpPost httpPost = new HttpPost(uploadUrl)
         logger.info("Will upload to: ${uploadUrl}")
 
-        MultipartEntity entity = new MultipartEntity();
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create()
 
-        entity.addPart("ipa", new FileBody(appFile))
+        entityBuilder.addPart("ipa", new FileBody(appFile))
         if (mappingFile) {
-            entity.addPart("dsym", new FileBody(mappingFile))
+            entityBuilder.addPart("dsym", new FileBody(mappingFile))
         }
-        decorateWithOptionalProperties(entity)
+        decorateWithOptionalProperties(entityBuilder)
 
         httpPost.addHeader("X-HockeyAppToken", project.hockeyapp.apiToken)
 
-        httpPost.setEntity(entity);
+
+        int lastProgress = 0
+        ProgressHttpEntityWrapper.ProgressCallback progressListener = new ProgressHttpEntityWrapper.ProgressCallback() {
+
+            @Override
+            public void progress(float progress) {
+                int progressInt = (int)progress
+                if (progressInt > lastProgress) {
+                    lastProgress = progressInt
+                    if (progressInt % 5 == 0) {
+                        progressLogger.progress(progressInt + "% uploaded")
+                    }
+                }
+            }
+            
+        }
+
+        httpPost.setEntity(new ProgressHttpEntityWrapper(entityBuilder.build(), progressListener));
 
         logger.info("Request: " + httpPost.getRequestLine().toString())
 
@@ -130,41 +161,42 @@ class HockeyAppUploadTask extends DefaultTask {
 
             logger.info(" application: " + uploadResponse.title + " v" + uploadResponse.shortversion + "(" + uploadResponse.version + ")");
             logger.debug(" upload response:\n" + uploadResponse)
+            progressLogger.completed()
         }
     }
 
-    private void decorateWithOptionalProperties(MultipartEntity entity) {
+    private void decorateWithOptionalProperties(MultipartEntityBuilder entityBuilder) {
         if (project.hockeyapp.notify) {
-            entity.addPart("notify", new StringBody(project.hockeyapp.notify))
+            entityBuilder.addPart("notify", new StringBody(project.hockeyapp.notify))
         }
         if (project.hockeyapp.notesType) {
-            entity.addPart("notes_type", new StringBody(project.hockeyapp.notesType))
+            entityBuilder.addPart("notes_type", new StringBody(project.hockeyapp.notesType))
         }
         if (project.hockeyapp.notes) {
-            entity.addPart("notes", new StringBody(project.hockeyapp.notes))
+            entityBuilder.addPart("notes", new StringBody(project.hockeyapp.notes))
         }
         if (project.hockeyapp.status) {
-            entity.addPart("status", new StringBody(project.hockeyapp.status))
+            entityBuilder.addPart("status", new StringBody(project.hockeyapp.status))
         }
         if (project.hockeyapp.releaseType) {
-            entity.addPart("release_type", new StringBody(project.hockeyapp.releaseType))
+            entityBuilder.addPart("release_type", new StringBody(project.hockeyapp.releaseType))
         }
         if (project.hockeyapp.commitSha) {
-            entity.addPart("commit_sha", new StringBody(project.hockeyapp.commitSha))
+            entityBuilder.addPart("commit_sha", new StringBody(project.hockeyapp.commitSha))
         }
         if (project.hockeyapp.buildServerUrl) {
-            entity.addPart("build_server_url", new StringBody(project.hockeyapp.buildServerUrl))
+            entityBuilder.addPart("build_server_url", new StringBody(project.hockeyapp.buildServerUrl))
         }
         if (project.hockeyapp.repositoryUrl) {
-            entity.addPart("repository_url", new StringBody(project.hockeyapp.repositoryUrl))
+            entityBuilder.addPart("repository_url", new StringBody(project.hockeyapp.repositoryUrl))
         }
         if (project.hockeyapp.tags) {
-            entity.addPart("tags", new StringBody(project.hockeyapp.tags))
+            entityBuilder.addPart("tags", new StringBody(project.hockeyapp.tags))
         }
     }
 
 
-    def getFile(String regex, File directory) {
+    def static getFile(String regex, File directory) {
         def pattern = Pattern.compile(regex)
 
         if (!directory.exists()) {
