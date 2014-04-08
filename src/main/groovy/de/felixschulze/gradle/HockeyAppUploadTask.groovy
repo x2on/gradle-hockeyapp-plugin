@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2013 Felix Schulze
+ * Copyright (c) 2013-2014 Felix Schulze
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,9 @@
 
 package de.felixschulze.gradle
 
+import de.felixschulze.gradle.util.ProgressHttpEntityWrapper
 import groovy.json.JsonSlurper
+import org.apache.http.HttpEntity
 import org.apache.http.HttpHost
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -36,6 +38,8 @@ import org.apache.http.entity.mime.content.StringBody
 import org.apache.http.impl.client.HttpClientBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
+import org.gradle.logging.ProgressLogger
+import org.gradle.logging.ProgressLoggerFactory
 
 import java.util.regex.Pattern
 
@@ -43,6 +47,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
     File applicationApk
     String variantName
+
 
     HockeyAppUploadTask() {
         super()
@@ -85,11 +90,12 @@ class HockeyAppUploadTask extends DefaultTask {
 
     def void uploadApp(File appFile, File mappingFile, String appId) {
 
+        ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation(this.getClass())
+        progressLogger.start("Upload file to Hockey App", "Upload file")
+
         RequestConfig.Builder requestBuilder = RequestConfig.custom()
         requestBuilder = requestBuilder.setConnectTimeout(project.hockeyapp.timeout)
         requestBuilder = requestBuilder.setConnectionRequestTimeout(project.hockeyapp.timeout)
-
-
 
         String proxyHost = System.getProperty("http.proxyHost", "")
         int proxyPort = System.getProperty("http.proxyPort", "0") as int
@@ -121,7 +127,24 @@ class HockeyAppUploadTask extends DefaultTask {
 
         httpPost.addHeader("X-HockeyAppToken", project.hockeyapp.apiToken)
 
-        httpPost.setEntity(entityBuilder.build());
+
+        int lastProgress = 0
+        ProgressHttpEntityWrapper.ProgressCallback progressListener = new ProgressHttpEntityWrapper.ProgressCallback() {
+
+            @Override
+            public void progress(float progress) {
+                int progressInt = (int)progress
+                if (progressInt > lastProgress) {
+                    lastProgress = progressInt
+                    if (progressInt % 5 == 0) {
+                        progressLogger.progress(progressInt + "% uploaded")
+                    }
+                }
+            }
+            
+        }
+
+        httpPost.setEntity(new ProgressHttpEntityWrapper(entityBuilder.build(), progressListener));
 
         logger.info("Request: " + httpPost.getRequestLine().toString())
 
@@ -138,6 +161,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
             logger.info(" application: " + uploadResponse.title + " v" + uploadResponse.shortversion + "(" + uploadResponse.version + ")");
             logger.debug(" upload response:\n" + uploadResponse)
+            progressLogger.completed()
         }
     }
 
