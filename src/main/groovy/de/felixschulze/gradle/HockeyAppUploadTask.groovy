@@ -28,12 +28,12 @@ import groovy.json.JsonSlurper
 import org.apache.http.HttpHost
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
+import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpPost
-import org.apache.http.conn.params.ConnRoutePNames
 import org.apache.http.entity.mime.MultipartEntityBuilder
 import org.apache.http.entity.mime.content.FileBody
 import org.apache.http.entity.mime.content.StringBody
-import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.impl.client.HttpClientBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
@@ -65,7 +65,6 @@ class HockeyAppUploadTask extends DefaultTask {
         }
         def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, project.hockeyapp.symbolsDirectory);
 
-
         println "App file: " + applicationApk.absolutePath
         if (mappingFile) {
             println "Mapping file: " + mappingFile.absolutePath
@@ -85,15 +84,24 @@ class HockeyAppUploadTask extends DefaultTask {
     }
 
     def void uploadApp(File appFile, File mappingFile, String appId) {
-        HttpClient httpClient = new DefaultHttpClient()
+
+        RequestConfig.Builder requestBuilder = RequestConfig.custom()
+        requestBuilder = requestBuilder.setConnectTimeout(project.hockeyapp.timeout)
+        requestBuilder = requestBuilder.setConnectionRequestTimeout(project.hockeyapp.timeout)
+
+
 
         String proxyHost = System.getProperty("http.proxyHost", "")
         int proxyPort = System.getProperty("http.proxyPort", "0") as int
         if (proxyHost.length() > 0 && proxyPort > 0) {
             println "Using proxy: " + proxyHost + ":" + proxyPort
             HttpHost proxy = new HttpHost(proxyHost, proxyPort);
-            httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+            requestBuilder = requestBuilder.setProxy(proxy)
         }
+
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        builder.setDefaultRequestConfig(requestBuilder.build());
+        HttpClient httpClient = builder.build();
 
         String uploadUrl = "https://rink.hockeyapp.net/api/2/apps"
         if (appId != null) {
@@ -164,7 +172,7 @@ class HockeyAppUploadTask extends DefaultTask {
     }
 
 
-    def getFile(String regex, File directory) {
+    def static getFile(String regex, File directory) {
         def pattern = Pattern.compile(regex)
 
         if (!directory.exists()) {

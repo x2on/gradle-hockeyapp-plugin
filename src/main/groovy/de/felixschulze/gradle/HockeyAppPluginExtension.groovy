@@ -41,6 +41,7 @@ class HockeyAppPluginExtension {
     def String buildServerUrl = null
     def String repositoryUrl = null
     def String tags = null
+    def int timeout = 60 * 1000
     def Map<String, String> variantToApplicationId = null
 
     private final Project project
