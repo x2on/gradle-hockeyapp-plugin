@@ -129,7 +129,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
 
         int lastProgress = 0
-        ProgressHttpEntityWrapper.ProgressCallback progressListener = new ProgressHttpEntityWrapper.ProgressCallback() {
+        ProgressHttpEntityWrapper.ProgressCallback progressCallback = new ProgressHttpEntityWrapper.ProgressCallback() {
 
             @Override
             public void progress(float progress) {
@@ -144,7 +144,7 @@ class HockeyAppUploadTask extends DefaultTask {
             
         }
 
-        httpPost.setEntity(new ProgressHttpEntityWrapper(entityBuilder.build(), progressListener));
+        httpPost.setEntity(new ProgressHttpEntityWrapper(entityBuilder.build(), progressCallback));
 
         logger.info("Request: " + httpPost.getRequestLine().toString())
 
