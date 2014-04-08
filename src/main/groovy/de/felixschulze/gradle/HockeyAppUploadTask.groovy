@@ -30,7 +30,7 @@ import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.conn.params.ConnRoutePNames
-import org.apache.http.entity.mime.MultipartEntity
+import org.apache.http.entity.mime.MultipartEntityBuilder
 import org.apache.http.entity.mime.content.FileBody
 import org.apache.http.entity.mime.content.StringBody
 import org.apache.http.impl.client.DefaultHttpClient
@@ -103,17 +103,17 @@ class HockeyAppUploadTask extends DefaultTask {
         HttpPost httpPost = new HttpPost(uploadUrl)
         logger.info("Will upload to: ${uploadUrl}")
 
-        MultipartEntity entity = new MultipartEntity();
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create()
 
-        entity.addPart("ipa", new FileBody(appFile))
+        entityBuilder.addPart("ipa", new FileBody(appFile))
         if (mappingFile) {
-            entity.addPart("dsym", new FileBody(mappingFile))
+            entityBuilder.addPart("dsym", new FileBody(mappingFile))
         }
-        decorateWithOptionalProperties(entity)
+        decorateWithOptionalProperties(entityBuilder)
 
         httpPost.addHeader("X-HockeyAppToken", project.hockeyapp.apiToken)
 
-        httpPost.setEntity(entity);
+        httpPost.setEntity(entityBuilder.build());
 
         logger.info("Request: " + httpPost.getRequestLine().toString())
 
@@ -133,33 +133,33 @@ class HockeyAppUploadTask extends DefaultTask {
         }
     }
 
-    private void decorateWithOptionalProperties(MultipartEntity entity) {
+    private void decorateWithOptionalProperties(MultipartEntityBuilder entityBuilder) {
         if (project.hockeyapp.notify) {
-            entity.addPart("notify", new StringBody(project.hockeyapp.notify))
+            entityBuilder.addPart("notify", new StringBody(project.hockeyapp.notify))
         }
         if (project.hockeyapp.notesType) {
-            entity.addPart("notes_type", new StringBody(project.hockeyapp.notesType))
+            entityBuilder.addPart("notes_type", new StringBody(project.hockeyapp.notesType))
         }
         if (project.hockeyapp.notes) {
-            entity.addPart("notes", new StringBody(project.hockeyapp.notes))
+            entityBuilder.addPart("notes", new StringBody(project.hockeyapp.notes))
         }
         if (project.hockeyapp.status) {
-            entity.addPart("status", new StringBody(project.hockeyapp.status))
+            entityBuilder.addPart("status", new StringBody(project.hockeyapp.status))
         }
         if (project.hockeyapp.releaseType) {
-            entity.addPart("release_type", new StringBody(project.hockeyapp.releaseType))
+            entityBuilder.addPart("release_type", new StringBody(project.hockeyapp.releaseType))
         }
         if (project.hockeyapp.commitSha) {
-            entity.addPart("commit_sha", new StringBody(project.hockeyapp.commitSha))
+            entityBuilder.addPart("commit_sha", new StringBody(project.hockeyapp.commitSha))
         }
         if (project.hockeyapp.buildServerUrl) {
-            entity.addPart("build_server_url", new StringBody(project.hockeyapp.buildServerUrl))
+            entityBuilder.addPart("build_server_url", new StringBody(project.hockeyapp.buildServerUrl))
         }
         if (project.hockeyapp.repositoryUrl) {
-            entity.addPart("repository_url", new StringBody(project.hockeyapp.repositoryUrl))
+            entityBuilder.addPart("repository_url", new StringBody(project.hockeyapp.repositoryUrl))
         }
         if (project.hockeyapp.tags) {
-            entity.addPart("tags", new StringBody(project.hockeyapp.tags))
+            entityBuilder.addPart("tags", new StringBody(project.hockeyapp.tags))
         }
     }
 
