@@ -41,7 +41,7 @@ import java.util.regex.Pattern
 
 class HockeyAppUploadTask extends DefaultTask {
 
-    File applicationApk
+    File applicationFile
     String variantName
 
     HockeyAppUploadTask() {
@@ -57,16 +57,16 @@ class HockeyAppUploadTask extends DefaultTask {
             throw new IllegalArgumentException("Cannot upload to HockeyApp because API Token is missing")
         }
 
-        if (applicationApk == null || !applicationApk.exists()) {
-            applicationApk = getFile(project.hockeyapp.appFileNameRegex, project.hockeyapp.outputDirectory);
-            if (applicationApk == null) {
+        if (applicationFile == null || !applicationFile.exists()) {
+            applicationFile = getFile(project.hockeyapp.appFileNameRegex, project.hockeyapp.outputDirectory);
+            if (applicationFile == null) {
                 throw new IllegalStateException("No app file found in directory " + project.hockeyapp.outputDirectory.absolutePath)
             }
         }
         def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, project.hockeyapp.symbolsDirectory);
 
 
-        println "App file: " + applicationApk.absolutePath
+        println "App file: " + applicationFile.absolutePath
         if (mappingFile) {
             println "Mapping file: " + mappingFile.absolutePath
         }
@@ -81,7 +81,7 @@ class HockeyAppUploadTask extends DefaultTask {
                 throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
         }
 
-        uploadApp(applicationApk, mappingFile, appId)
+        uploadApp(applicationFile, mappingFile, appId)
     }
 
     def void uploadApp(File appFile, File mappingFile, String appId) {
