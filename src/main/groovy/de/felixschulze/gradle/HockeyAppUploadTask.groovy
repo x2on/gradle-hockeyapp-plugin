@@ -70,12 +70,12 @@ class HockeyAppUploadTask extends DefaultTask {
         }
         def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, project.hockeyapp.symbolsDirectory);
 
-        println "App file: " + applicationFile.absolutePath
+        logger.lifecycle("App file: " + applicationFile.absolutePath)
         if (mappingFile) {
-            println "Mapping file: " + mappingFile.absolutePath
+            logger.lifecycle("Mapping file: " + mappingFile.absolutePath)
         }
         else {
-            println "WARNING: No Mapping file found."
+            logger.warn("No Mapping file found.")
         }
 
         String appId = null
@@ -100,7 +100,7 @@ class HockeyAppUploadTask extends DefaultTask {
         String proxyHost = System.getProperty("http.proxyHost", "")
         int proxyPort = System.getProperty("http.proxyPort", "0") as int
         if (proxyHost.length() > 0 && proxyPort > 0) {
-            println "Using proxy: " + proxyHost + ":" + proxyPort
+            logger.lifecycle("Using proxy: " + proxyHost + ":" + proxyPort)
             HttpHost proxy = new HttpHost(proxyHost, proxyPort);
             requestBuilder = requestBuilder.setProxy(proxy)
         }
@@ -154,7 +154,7 @@ class HockeyAppUploadTask extends DefaultTask {
             throw new IllegalStateException("File upload failed: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
         }
         else {
-            println "Application uploaded successfully."
+            logger.lifecycle("Application uploaded successfully.")
             InputStreamReader reader = new InputStreamReader(response.getEntity().content)
             def uploadResponse = new JsonSlurper().parse(reader)
             reader.close()
