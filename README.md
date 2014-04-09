@@ -11,7 +11,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:1.5+'
+        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:1.7+'
     }
 }
 
@@ -57,6 +57,7 @@ hockeyapp {
 * `commitSha`: Optional: commit SHA for this build
 * `buildServerUrl`: Optional: the URL of the build job on your build server
 * `repositoryUrl`: Optional: your source repository URL
+* `teamCityLog`: `true` Add features for [TeamCity](http://www.jetbrains.com/teamcity/)
 
 ## Changelog
 
