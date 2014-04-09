@@ -25,6 +25,8 @@
 package de.felixschulze.gradle
 
 import de.felixschulze.gradle.util.ProgressHttpEntityWrapper
+import de.felixschulze.teamcity.TeamCityProgressType
+import de.felixschulze.teamcity.TeamCityStatusMessageHelper
 import groovy.json.JsonSlurper
 import org.apache.http.HttpEntity
 import org.apache.http.HttpHost
@@ -93,6 +95,9 @@ class HockeyAppUploadTask extends DefaultTask {
 
         ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation(this.getClass())
         progressLogger.start("Upload file to Hockey App", "Upload file")
+        if (project.hockeyapp.teamCityLog) {
+            println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.START, "Upload file to Hockey App")
+        }
 
         RequestConfig.Builder requestBuilder = RequestConfig.custom()
         requestBuilder = requestBuilder.setConnectTimeout(project.hockeyapp.timeout)
@@ -130,7 +135,8 @@ class HockeyAppUploadTask extends DefaultTask {
 
 
         int lastProgress = 0
-        Logger loggerForCallback = logger;
+        Logger loggerForCallback = logger
+        Boolean teamCityLog = project.hockeyapp.teamCityLog
         ProgressHttpEntityWrapper.ProgressCallback progressCallback = new ProgressHttpEntityWrapper.ProgressCallback() {
 
             @Override
@@ -141,6 +147,9 @@ class HockeyAppUploadTask extends DefaultTask {
                     if (progressInt % 5 == 0) {
                         progressLogger.progress(progressInt + "% uploaded")
                         loggerForCallback.info(progressInt + "% uploaded")
+                        if (teamCityLog) {
+                            println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.MESSAGE, progressInt + "% uploaded")
+                        }
                     }
                 }
             }
@@ -164,6 +173,9 @@ class HockeyAppUploadTask extends DefaultTask {
 
             logger.info(" application: " + uploadResponse.title + " v" + uploadResponse.shortversion + "(" + uploadResponse.version + ")");
             logger.debug(" upload response:\n" + uploadResponse)
+            if (project.hockeyapp.teamCityLog) {
+                println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.FINISH, "Application uploaded successfully.")
+            }
             progressLogger.completed()
         }
     }
