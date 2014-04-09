@@ -37,6 +37,7 @@ import org.apache.http.entity.mime.content.FileBody
 import org.apache.http.entity.mime.content.StringBody
 import org.apache.http.impl.client.HttpClientBuilder
 import org.gradle.api.DefaultTask
+import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.TaskAction
 import org.gradle.logging.ProgressLogger
 import org.gradle.logging.ProgressLoggerFactory
@@ -129,6 +130,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
 
         int lastProgress = 0
+        Logger loggerForCallback = logger;
         ProgressHttpEntityWrapper.ProgressCallback progressCallback = new ProgressHttpEntityWrapper.ProgressCallback() {
 
             @Override
@@ -138,6 +140,7 @@ class HockeyAppUploadTask extends DefaultTask {
                     lastProgress = progressInt
                     if (progressInt % 5 == 0) {
                         progressLogger.progress(progressInt + "% uploaded")
+                        loggerForCallback.info(progressInt + "% uploaded")
                     }
                 }
             }
