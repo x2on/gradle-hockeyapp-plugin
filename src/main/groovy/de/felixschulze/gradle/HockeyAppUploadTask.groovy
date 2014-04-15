@@ -49,6 +49,7 @@ import java.util.regex.Pattern
 class HockeyAppUploadTask extends DefaultTask {
 
     File applicationFile
+    File mappingFile
     String variantName
 
 
@@ -71,7 +72,8 @@ class HockeyAppUploadTask extends DefaultTask {
                 throw new IllegalStateException("No app file found in directory " + project.hockeyapp.outputDirectory.absolutePath)
             }
         }
-        def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, project.hockeyapp.symbolsDirectory);
+        File symbolsDirectory = mappingFile != null && mappingFile.exists() ? mappingFile : project.hockeyapp.symbolsDirectory
+        def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, symbolsDirectory);
 
         logger.lifecycle("App file: " + applicationFile.absolutePath)
         if (mappingFile) {
