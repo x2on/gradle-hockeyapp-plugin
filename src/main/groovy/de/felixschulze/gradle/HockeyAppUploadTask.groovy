@@ -28,7 +28,6 @@ import de.felixschulze.gradle.util.ProgressHttpEntityWrapper
 import de.felixschulze.teamcity.TeamCityProgressType
 import de.felixschulze.teamcity.TeamCityStatusMessageHelper
 import groovy.json.JsonSlurper
-import org.apache.http.HttpEntity
 import org.apache.http.HttpHost
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -49,7 +48,7 @@ import java.util.regex.Pattern
 class HockeyAppUploadTask extends DefaultTask {
 
     File applicationFile
-    File mappingFile
+    File symbolsDirectory
     String variantName
 
 
@@ -72,7 +71,9 @@ class HockeyAppUploadTask extends DefaultTask {
                 throw new IllegalStateException("No app file found in directory " + project.hockeyapp.outputDirectory.absolutePath)
             }
         }
-        File symbolsDirectory = mappingFile != null && mappingFile.exists() ? mappingFile : project.hockeyapp.symbolsDirectory
+        if (symbolsDirectory == null || !symbolsDirectory.exists()) {
+            symbolsDirectory = project.hockeyapp.symbolsDirectory
+        }
         def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, symbolsDirectory);
 
         logger.lifecycle("App file: " + applicationFile.absolutePath)

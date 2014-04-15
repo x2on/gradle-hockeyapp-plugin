@@ -28,7 +28,7 @@ import org.gradle.api.Project
 
 class HockeyAppPluginExtension {
     def Object outputDirectory
-    def Object symbolsDirectory
+    def File symbolsDirectory
     def String apiToken = null
     def String notes = "This build was uploaded using the gradle-hockeyapp-plugin"
     def String status = 2
@@ -52,7 +52,6 @@ class HockeyAppPluginExtension {
         this.outputDirectory = {
             return project.project.getBuildDir()
         }
-        this.symbolsDirectory = this.outputDirectory
     }
 
     File getOutputDirectory() {
@@ -61,14 +60,6 @@ class HockeyAppPluginExtension {
 
     void setOutputDirectory(Object outputDirectory) {
         this.outputDirectory = outputDirectory
-    }
-
-    File getSymbolsDirectory() {
-        return project.file(symbolsDirectory)
-    }
-
-    void setSymbolsDirectory(Object symbolsDirectory) {
-        this.symbolsDirectory = symbolsDirectory
     }
 
 
