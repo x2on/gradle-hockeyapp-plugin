@@ -1,4 +1,5 @@
-# gradle-hockeyapp-plugin [![Build Status](https://travis-ci.org/x2on/gradle-hockeyapp-plugin.png)](https://travis-ci.org/x2on/gradle-hockeyapp-plugin)
+# gradle-hockeyapp-plugin [![Build Status](https://travis-ci.org/x2on/gradle-hockeyapp-plugin.png)](https://travis-ci.org/x2on/gradle-hockeyapp-plugin) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.felixschulze.gradle/gradle-hockeyapp-plugin/badge.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22de.felixschulze.gradle%22%20AND%20a%3A%22gradle-hockeyapp-plugin%22)
+
 A Gradle plugin for uploading iOS and Android Apps to HockeyApp. 
 
 ## Basic usage
