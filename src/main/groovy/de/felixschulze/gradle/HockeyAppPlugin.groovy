@@ -54,6 +54,7 @@ class HockeyAppPlugin implements Plugin<Project> {
                 task.group = 'HockeyApp'
                 task.description = "Upload '${variant.name}' to HockeyApp"
                 task.applicationFile = variant.outputFile
+                task.symbolsDirectory = variant.getProcessResources().textSymbolOutputDir
                 task.variantName = variant.name
                 task.outputs.upToDateWhen { false }
 
