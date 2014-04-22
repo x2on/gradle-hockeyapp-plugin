@@ -220,7 +220,7 @@ class HockeyAppUploadTask extends DefaultTask {
         def pattern = Pattern.compile(regex)
 
         if (!directory.exists()) {
-            throw new IllegalStateException("OutputDirectory not found")
+            return null
         }
 
         def fileList = directory.list(
