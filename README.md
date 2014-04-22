@@ -34,8 +34,6 @@ hockeyapp {
     status = 2
     notesType = 1
     notes = "Some notes."
-    symbolsDirectory = file("build/symbols/")
-    mappingFileNameRegex = "R.txt"
     variantToApplicationId = [
             BuildVariantA:  "applicationIdA",
             BuildVariantB:  "applicationIdB",
@@ -52,7 +50,7 @@ hockeyapp {
 * `status`: `1` not allow users to download the version, `2` make the version available for download
 * `notes`: Release notes as Textile or Markdown
 * `notesType`: `0` Textile, `1` Markdown
-* `mappingFileNameRegex`:  Optional: `mappingFileNameRegex= "R.txt"` Should contain the filename or a regex for the `R` mapping file (Android) or `dSYM` file (iOS)
+* `mappingFileNameRegex`:  Optional: `mappingFileNameRegex="mapping.txt"` Should contain the filename or a regex for the proguard `mapping.txt` mapping file (Android) or `dSYM` file (iOS). Standard is `mapping.txt`
 * `variantToApplicationId`:  Optional (Android): `[variantName: "appId", variantName2: "appId2"]` map between your variants and application IDs
 * `symbolsDirectory`: Only needed for iOS or if you dont use the android gradle plugin: `file("directory")` Directory which contains the `R` or `dSYM` file
 * `appFileNameRegex`: Only needed for iOS or if you dont use the android gradle plugin

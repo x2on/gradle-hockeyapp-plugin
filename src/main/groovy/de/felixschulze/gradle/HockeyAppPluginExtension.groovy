@@ -28,7 +28,7 @@ import org.gradle.api.Project
 
 class HockeyAppPluginExtension {
     def Object outputDirectory
-    def File symbolsDirectory
+    def File symbolsDirectory = null
     def String apiToken = null
     def String notes = "This build was uploaded using the gradle-hockeyapp-plugin"
     def String status = 2
@@ -36,7 +36,7 @@ class HockeyAppPluginExtension {
     def String notesType = 1
     def String releaseType = 0
     def String appFileNameRegex = null
-    def String mappingFileNameRegex = "R.txt"
+    def String mappingFileNameRegex = "mapping.txt"
     def String commitSha = null
     def String buildServerUrl = null
     def String repositoryUrl = null

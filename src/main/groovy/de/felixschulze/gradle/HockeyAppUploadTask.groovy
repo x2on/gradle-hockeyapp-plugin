@@ -54,7 +54,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
     HockeyAppUploadTask() {
         super()
-        this.description = "Uploades the app (.ipa, .dsym, .apk) to HockeyApp"
+        this.description = "Uploades the app (Android: (.apk, mapping.txt), iOS:(.ipa, .dsym)) to HockeyApp"
     }
 
 
@@ -71,7 +71,9 @@ class HockeyAppUploadTask extends DefaultTask {
                 throw new IllegalStateException("No app file found in directory " + project.hockeyapp.outputDirectory.absolutePath)
             }
         }
-        if (symbolsDirectory == null || !symbolsDirectory.exists()) {
+
+        //Override symbolsDirectory if set in build file
+        if (project.hockeyapp.symbolsDirectory != null && project.hockeyapp.symbolsDirectory.exists()) {
             symbolsDirectory = project.hockeyapp.symbolsDirectory
         }
         def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, symbolsDirectory);
