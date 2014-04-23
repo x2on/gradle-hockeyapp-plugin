@@ -1,6 +1,10 @@
 language: groovy
-install: ./gradlew assemble
-script: ./gradlew clean build
+
+install: ./gradlew clean assemble
+
 branches:
   only:
     - master
+    
+env:
+   - TERM=dumb
