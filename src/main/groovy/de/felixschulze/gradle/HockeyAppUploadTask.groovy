@@ -170,10 +170,10 @@ class HockeyAppUploadTask extends DefaultTask {
         if (response.getStatusLine().getStatusCode() != 201) {
             if (response.getEntity() != null && response.getEntity().getContentLength() > 0) {
                 InputStreamReader reader = new InputStreamReader(response.getEntity().content)
-                Object uploadResponse = new JsonSlurper().parse(reader)
+                def uploadResponse = new JsonSlurper().parse(reader)
                 reader.close()
                 logger.debug("Upload response: " + uploadResponse)
-                if (uploadResponse.status.equals("error") && uploadResponse.message) {
+                if (uploadResponse != null && uploadResponse.status != null && uploadResponse.status.equals("error") && uploadResponse.message) {
                     logger.error("Error response from HockeyApp: " + uploadResponse.message)
                     throw new IllegalStateException("File upload failed: " + uploadResponse.message + " - Status: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
                 }
@@ -182,12 +182,15 @@ class HockeyAppUploadTask extends DefaultTask {
         }
         else {
             logger.lifecycle("Application uploaded successfully.")
-            InputStreamReader reader = new InputStreamReader(response.getEntity().content)
-            def uploadResponse = new JsonSlurper().parse(reader)
-            reader.close()
-
-            logger.info(" application: " + uploadResponse.title + " v" + uploadResponse.shortversion + "(" + uploadResponse.version + ")");
-            logger.debug(" upload response: " + uploadResponse)
+            if (response.getEntity() != null && response.getEntity().getContentLength() > 0) {
+                InputStreamReader reader = new InputStreamReader(response.getEntity().content)
+                def uploadResponse = new JsonSlurper().parse(reader)
+                reader.close()
+                if (uploadResponse != null) {
+                    logger.info(" application: " + uploadResponse.title + " v" + uploadResponse.shortversion + "(" + uploadResponse.version + ")");
+                    logger.debug(" upload response: " + uploadResponse)
+                }
+            }
             if (project.hockeyapp.teamCityLog) {
                 println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.FINISH, "Application uploaded successfully.")
             }
