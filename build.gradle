@@ -30,7 +30,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.3+'
     compile 'org.apache.httpcomponents:httpmime:4.3+'
     compile 'com.android.tools.build:gradle:0.9.+'
-    compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.0+'
+    compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.0.2+'
 }
 
 
