@@ -55,7 +55,19 @@ class HockeyAppPlugin implements Plugin<Project> {
                 task.description = "Upload '${variant.name}' to HockeyApp"
                 task.applicationFile = variant.outputFile
                 File symbolsDirectory = variant.getProcessResources().textSymbolOutputDir
-                if (variant.getProguard()) {
+                Boolean isProguardActive = false
+                if (variant.metaClass.respondsTo("getProguard")) {
+                    // gradle-android-plugin 0.9.x
+                    if (variant.getProguard()) {
+                        isProguardActive = true
+                    }
+                }
+                else {
+                    if (variant.getObfuscation()) {
+                        isProguardActive = true
+                    }
+                }
+                if (isProguardActive) {
                     String flavorFilePart = ""
                     if (variant.getFlavorName().length() > 0) {
                         flavorFilePart = "${variant.getFlavorName()}/"
