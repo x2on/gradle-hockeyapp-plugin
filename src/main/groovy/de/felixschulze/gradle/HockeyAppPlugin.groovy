@@ -55,13 +55,13 @@ class HockeyAppPlugin implements Plugin<Project> {
                 task.description = "Upload '${variant.name}' to HockeyApp"
                 task.applicationFile = variant.outputFile
                 File symbolsDirectory = variant.getProcessResources().textSymbolOutputDir
-                if (variant.getProguard()) {
+
+                if (isProguardActive(variant)) {
                     String flavorFilePart = ""
                     if (variant.getFlavorName().length() > 0) {
                         flavorFilePart = "${variant.getFlavorName()}/"
                     }
                     symbolsDirectory = new File(project.buildDir, "proguard/${flavorFilePart}${variant.getBuildType().getName()}")
-
                 }
                 task.symbolsDirectory = symbolsDirectory
                 task.variantName = variant.name
@@ -77,6 +77,21 @@ class HockeyAppPlugin implements Plugin<Project> {
         project.repositories {
             mavenCentral()
         }
+    }
+
+    static Boolean isProguardActive(ApplicationVariant variant) {
+        if (variant.metaClass.respondsTo(variant, "getProguard")) {
+            // gradle-android-plugin 0.9.x
+            if (variant.getProguard()) {
+                return true
+            }
+        }
+        else {
+            if (variant.getObfuscation()) {
+                return true
+            }
+        }
+        return false
     }
 
 }
