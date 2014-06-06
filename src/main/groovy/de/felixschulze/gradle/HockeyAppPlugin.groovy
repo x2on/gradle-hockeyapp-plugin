@@ -33,7 +33,6 @@ import com.android.build.gradle.AppPlugin
 class HockeyAppPlugin implements Plugin<Project> {
 
     void apply(Project project) {
-        configureDependencies(project)
         applyExtensions(project)
         applyTasks(project)
     }
@@ -69,13 +68,6 @@ class HockeyAppPlugin implements Plugin<Project> {
 
                 task.dependsOn variant.assemble
             }
-        }
-    }
-
-
-    void configureDependencies(final Project project) {
-        project.repositories {
-            mavenCentral()
         }
     }
 
