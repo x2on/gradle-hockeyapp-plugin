@@ -60,7 +60,7 @@ class HockeyAppPlugin implements Plugin<Project> {
                     if (variant.getFlavorName().length() > 0) {
                         flavorFilePart = "${variant.getFlavorName()}/"
                     }
-                    symbolsDirectory = new File(project.buildDir, "proguard/${flavorFilePart}${variant.getBuildType().getName()}")
+                    symbolsDirectory = new File(project.buildDir, "outputs/proguard/${flavorFilePart}${variant.getBuildType().getName()}")
                 }
                 task.symbolsDirectory = symbolsDirectory
                 task.variantName = variant.name
