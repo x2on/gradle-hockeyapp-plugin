@@ -55,7 +55,7 @@ class HockeyAppPlugin implements Plugin<Project> {
                 task.applicationFile = variant.outputFile
                 File symbolsDirectory = variant.getProcessResources().textSymbolOutputDir
 
-                if (isProguardActive(variant)) {
+                if (variant.getObfuscation()) {
                     String flavorFilePart = ""
                     if (variant.getFlavorName().length() > 0) {
                         flavorFilePart = "${variant.getFlavorName()}/"
@@ -69,21 +69,6 @@ class HockeyAppPlugin implements Plugin<Project> {
                 task.dependsOn variant.assemble
             }
         }
-    }
-
-    static Boolean isProguardActive(ApplicationVariant variant) {
-        if (variant.metaClass.respondsTo(variant, "getProguard")) {
-            // gradle-android-plugin 0.9.x
-            if (variant.getProguard()) {
-                return true
-            }
-        }
-        else {
-            if (variant.getObfuscation()) {
-                return true
-            }
-        }
-        return false
     }
 
 }
