@@ -158,7 +158,7 @@ class HockeyAppUploadTask extends DefaultTask {
                     }
                 }
             }
-            
+
         }
 
         httpPost.setEntity(new ProgressHttpEntityWrapper(entityBuilder.build(), progressCallback));
@@ -208,8 +208,14 @@ class HockeyAppUploadTask extends DefaultTask {
         if (project.hockeyapp.notes) {
             entityBuilder.addPart("notes", new StringBody(project.hockeyapp.notes))
         }
-        if (project.hockeyapp.status) {
-            entityBuilder.addPart("status", new StringBody(project.hockeyapp.status))
+        String status = project.hockeyapp.status
+        if (project.hockeyapp.variantToStatus != null) {
+            if (project.hockeyapp.variantToStatus[variantName]){
+              status = project.hockeyapp.variantToStatus[variantName]
+            }
+        }
+        if (status) {
+            entityBuilder.addPart("status", new StringBody(status))
         }
         if (project.hockeyapp.releaseType) {
             entityBuilder.addPart("release_type", new StringBody(project.hockeyapp.releaseType))
@@ -225,6 +231,15 @@ class HockeyAppUploadTask extends DefaultTask {
         }
         if (project.hockeyapp.tags) {
             entityBuilder.addPart("tags", new StringBody(project.hockeyapp.tags))
+        }
+        String mandatory = project.hockeyapp.mandatory
+        if (project.hockeyapp.variantToMandatory != null){
+            if (project.hockeyapp.variantToMandatory[variantName]){
+              mandatory = project.hockeyapp.variantToMandatory[variantName]
+            }
+        }
+        if (mandatory){
+            entityBuilder.addPart("mandatory", new StringBody(mandatory))
         }
     }
 
