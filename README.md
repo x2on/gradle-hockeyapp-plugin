@@ -67,7 +67,7 @@ hockeyapp {
 
 ## Fix for Error with Top-Level-Projects
 
-If you use a top-level-project and got the error `java.lang.NoSuchFieldError: INSTANCE` move the dependency to this plugin to your root `build.gradle` file (see #30)
+If you use a top-level-project and got the error `java.lang.NoSuchFieldError: INSTANCE` move the dependency to this plugin to your root `build.gradle` file (see [#30](https://github.com/x2on/gradle-hockeyapp-plugin/issues/30))
 
 ## License
 
