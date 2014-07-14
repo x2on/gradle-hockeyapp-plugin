@@ -65,6 +65,10 @@ hockeyapp {
 
 [Releases](https://github.com/x2on/gradle-hockeyapp-plugin/releases)
 
+## Fix for Error with Top-Level-Projects
+
+If you use a top-level-project and got the error `java.lang.NoSuchFieldError: INSTANCE` move the dependency to this plugin to your root `build.gradle` file (see #30)
+
 ## License
 
 gradle-hockeyapp-plugin is available under the MIT license. See the LICENSE file for more info.
