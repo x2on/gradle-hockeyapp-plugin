@@ -232,6 +232,9 @@ class HockeyAppUploadTask extends DefaultTask {
         if (project.hockeyapp.tags) {
             entityBuilder.addPart("tags", new StringBody(project.hockeyapp.tags))
         }
+        if (project.hockeyapp.teams) {
+            entityBuilder.addPart("teams", new StringBody(project.hockeyapp.teams))
+        }
         String mandatory = project.hockeyapp.mandatory
         if (project.hockeyapp.variantToMandatory != null){
             if (project.hockeyapp.variantToMandatory[variantName]){
