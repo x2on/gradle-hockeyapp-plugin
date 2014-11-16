@@ -49,7 +49,9 @@ class HockeyAppUploadTask extends DefaultTask {
 
     File applicationFile
     File symbolsDirectory
+    File mappingFile
     String variantName
+    boolean mightHaveMapping = true   // Specify otherwise in Android config
 
 
     HockeyAppUploadTask() {
@@ -72,18 +74,18 @@ class HockeyAppUploadTask extends DefaultTask {
             }
         }
 
-        //Override symbolsDirectory if set in build file
-        if (project.hockeyapp.symbolsDirectory != null && project.hockeyapp.symbolsDirectory.exists()) {
+        // Retrieve mapping file if not using Android Gradle Plugin
+        // Requires it to be set in the project config
+        if (mightHaveMapping && !mappingFile && project.hockeyapp.symbolsDirectory?.exists()) {
             symbolsDirectory = project.hockeyapp.symbolsDirectory
-        }
-        def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, symbolsDirectory);
-
-        logger.lifecycle("App file: " + applicationFile.absolutePath)
-        if (mappingFile) {
-            logger.lifecycle("Mapping file: " + mappingFile.absolutePath)
-        }
-        else {
-            logger.warn("No Mapping file found.")
+            mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, symbolsDirectory);
+            logger.lifecycle("App file: " + applicationFile.absolutePath)
+            if (mappingFile) {
+                logger.lifecycle("Mapping file: " + mappingFile.absolutePath)
+            }
+            else {
+                logger.warn("No Mapping file found.")
+            }
         }
 
         String appId = null
