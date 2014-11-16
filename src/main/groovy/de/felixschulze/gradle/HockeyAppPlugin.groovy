@@ -52,7 +52,7 @@ class HockeyAppPlugin implements Plugin<Project> {
                 HockeyAppUploadTask task = project.tasks.create("upload${variant.name.capitalize()}ToHockeyApp", HockeyAppUploadTask)
                 task.group = 'HockeyApp'
                 task.description = "Upload '${variant.name}' to HockeyApp"
-                task.applicationFile = variant.outputFile
+                task.applicationFile = variant.outputs[0].outputFile
 
                 if (variant.getObfuscation()) {
                     task.mappingFile = variant.getMappingFile()
