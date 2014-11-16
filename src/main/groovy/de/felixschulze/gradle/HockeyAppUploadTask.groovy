@@ -38,6 +38,7 @@ import org.apache.http.entity.mime.content.FileBody
 import org.apache.http.entity.mime.content.StringBody
 import org.apache.http.impl.client.HttpClientBuilder
 import org.gradle.api.DefaultTask
+import org.gradle.api.Nullable
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.TaskAction
 import org.gradle.logging.ProgressLogger
@@ -98,7 +99,7 @@ class HockeyAppUploadTask extends DefaultTask {
         uploadApp(applicationFile, mappingFile, appId)
     }
 
-    def void uploadApp(File appFile, File mappingFile, String appId) {
+    def void uploadApp(File appFile, @Nullable File mappingFile, String appId) {
 
         ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation(this.getClass())
         progressLogger.start("Upload file to Hockey App", "Upload file")
@@ -248,7 +249,7 @@ class HockeyAppUploadTask extends DefaultTask {
         }
     }
 
-
+    @Nullable
     def static getFile(String regex, File directory) {
         def pattern = Pattern.compile(regex)
 
