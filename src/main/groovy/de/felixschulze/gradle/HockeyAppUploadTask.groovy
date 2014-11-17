@@ -57,7 +57,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
     HockeyAppUploadTask() {
         super()
-        this.description = "Uploades the app (Android: (.apk, mapping.txt), iOS:(.ipa, .dsym)) to HockeyApp"
+        this.description = "Uploads the app (Android: (.apk, mapping.txt), iOS:(.ipa, .dsym)) to HockeyApp"
     }
 
 
