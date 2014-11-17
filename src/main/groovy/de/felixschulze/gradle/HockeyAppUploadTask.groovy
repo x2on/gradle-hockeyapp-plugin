@@ -75,18 +75,21 @@ class HockeyAppUploadTask extends DefaultTask {
             }
         }
 
+        logger.lifecycle("App file: " + applicationFile.absolutePath)
+
         // Retrieve mapping file if not using Android Gradle Plugin
         // Requires it to be set in the project config
         if (mightHaveMapping && !mappingFile && project.hockeyapp.symbolsDirectory?.exists()) {
             symbolsDirectory = project.hockeyapp.symbolsDirectory
             mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, symbolsDirectory);
-            logger.lifecycle("App file: " + applicationFile.absolutePath)
-            if (mappingFile) {
-                logger.lifecycle("Mapping file: " + mappingFile.absolutePath)
-            }
-            else {
+
+            if (!mappingFile) {
                 logger.warn("No Mapping file found.")
             }
+        }
+
+        if (mappingFile) {
+            logger.lifecycle("Mapping file: " + mappingFile.absolutePath)
         }
 
         String appId = null
