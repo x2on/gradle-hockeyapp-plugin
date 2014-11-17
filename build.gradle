@@ -71,7 +71,7 @@ install.repositories.mavenInstaller {
 uploadArchives {
     repositories.mavenDeployer {
         if (signing.signatory) {
-            beforeDeployment { signPom(it) }
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
         }
         name = 'mavenCentralReleaseDeployer'
         repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
