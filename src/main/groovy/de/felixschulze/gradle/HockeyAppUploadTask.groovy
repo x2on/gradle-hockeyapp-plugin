@@ -38,6 +38,7 @@ import org.apache.http.entity.mime.content.FileBody
 import org.apache.http.entity.mime.content.StringBody
 import org.apache.http.impl.client.HttpClientBuilder
 import org.gradle.api.DefaultTask
+import org.gradle.api.Nullable
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.TaskAction
 import org.gradle.logging.ProgressLogger
@@ -49,7 +50,9 @@ class HockeyAppUploadTask extends DefaultTask {
 
     File applicationFile
     File symbolsDirectory
+    File mappingFile
     String variantName
+    boolean mightHaveMapping = true   // Specify otherwise in Android config
 
 
     HockeyAppUploadTask() {
@@ -61,42 +64,42 @@ class HockeyAppUploadTask extends DefaultTask {
     @TaskAction
     def upload() throws IOException {
 
-        if (project.hockeyapp.apiToken == null) {
+        if (!project.hockeyapp.apiToken) {
             throw new IllegalArgumentException("Cannot upload to HockeyApp because API Token is missing")
         }
 
-        if (applicationFile == null || !applicationFile.exists()) {
+        if (!applicationFile?.exists()) {
             applicationFile = getFile(project.hockeyapp.appFileNameRegex, project.hockeyapp.outputDirectory);
-            if (applicationFile == null) {
+            if (!applicationFile) {
                 throw new IllegalStateException("No app file found in directory " + project.hockeyapp.outputDirectory.absolutePath)
             }
         }
 
-        //Override symbolsDirectory if set in build file
-        if (project.hockeyapp.symbolsDirectory != null && project.hockeyapp.symbolsDirectory.exists()) {
+        // Retrieve mapping file if not using Android Gradle Plugin
+        // Requires it to be set in the project config
+        if (mightHaveMapping && !mappingFile && project.hockeyapp.symbolsDirectory?.exists()) {
             symbolsDirectory = project.hockeyapp.symbolsDirectory
-        }
-        def mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, symbolsDirectory);
-
-        logger.lifecycle("App file: " + applicationFile.absolutePath)
-        if (mappingFile) {
-            logger.lifecycle("Mapping file: " + mappingFile.absolutePath)
-        }
-        else {
-            logger.warn("No Mapping file found.")
+            mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, symbolsDirectory);
+            logger.lifecycle("App file: " + applicationFile.absolutePath)
+            if (mappingFile) {
+                logger.lifecycle("Mapping file: " + mappingFile.absolutePath)
+            }
+            else {
+                logger.warn("No Mapping file found.")
+            }
         }
 
         String appId = null
-        if (project.hockeyapp.variantToApplicationId != null) {
+        if (project.hockeyapp.variantToApplicationId) {
             appId = project.hockeyapp.variantToApplicationId[variantName]
-            if (appId == null)
+            if (!appId)
                 throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
         }
 
         uploadApp(applicationFile, mappingFile, appId)
     }
 
-    def void uploadApp(File appFile, File mappingFile, String appId) {
+    def void uploadApp(File appFile, @Nullable File mappingFile, String appId) {
 
         ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation(this.getClass())
         progressLogger.start("Upload file to Hockey App", "Upload file")
@@ -121,7 +124,7 @@ class HockeyAppUploadTask extends DefaultTask {
         HttpClient httpClient = builder.build();
 
         String uploadUrl = "https://rink.hockeyapp.net/api/2/apps"
-        if (appId != null) {
+        if (appId) {
             uploadUrl = "https://rink.hockeyapp.net/api/2/apps/${appId}/app_versions/upload"
         }
 
@@ -168,12 +171,12 @@ class HockeyAppUploadTask extends DefaultTask {
         HttpResponse response = httpClient.execute(httpPost)
 
         if (response.getStatusLine().getStatusCode() != 201) {
-            if (response.getEntity() != null && response.getEntity().getContentLength() > 0) {
+            if (response.getEntity() && response.getEntity().getContentLength() > 0) {
                 InputStreamReader reader = new InputStreamReader(response.getEntity().content)
                 def uploadResponse = new JsonSlurper().parse(reader)
                 reader.close()
                 logger.debug("Upload response: " + uploadResponse)
-                if (uploadResponse != null && uploadResponse.status != null && uploadResponse.status.equals("error") && uploadResponse.message) {
+                if (uploadResponse && uploadResponse.status && uploadResponse.status.equals("error") && uploadResponse.message) {
                     logger.error("Error response from HockeyApp: " + uploadResponse.message)
                     throw new IllegalStateException("File upload failed: " + uploadResponse.message + " - Status: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
                 }
@@ -182,11 +185,11 @@ class HockeyAppUploadTask extends DefaultTask {
         }
         else {
             logger.lifecycle("Application uploaded successfully.")
-            if (response.getEntity() != null && response.getEntity().getContentLength() > 0) {
+            if (response.getEntity() && response.getEntity().getContentLength() > 0) {
                 InputStreamReader reader = new InputStreamReader(response.getEntity().content)
                 def uploadResponse = new JsonSlurper().parse(reader)
                 reader.close()
-                if (uploadResponse != null) {
+                if (uploadResponse) {
                     logger.info(" application: " + uploadResponse.title + " v" + uploadResponse.shortversion + "(" + uploadResponse.version + ")");
                     logger.debug(" upload response: " + uploadResponse)
                 }
@@ -209,7 +212,7 @@ class HockeyAppUploadTask extends DefaultTask {
             entityBuilder.addPart("notes", new StringBody(project.hockeyapp.notes))
         }
         String status = project.hockeyapp.status
-        if (project.hockeyapp.variantToStatus != null) {
+        if (project.hockeyapp.variantToStatus) {
             if (project.hockeyapp.variantToStatus[variantName]){
               status = project.hockeyapp.variantToStatus[variantName]
             }
@@ -236,7 +239,7 @@ class HockeyAppUploadTask extends DefaultTask {
             entityBuilder.addPart("teams", new StringBody(project.hockeyapp.teams))
         }
         String mandatory = project.hockeyapp.mandatory
-        if (project.hockeyapp.variantToMandatory != null){
+        if (project.hockeyapp.variantToMandatory){
             if (project.hockeyapp.variantToMandatory[variantName]){
               mandatory = project.hockeyapp.variantToMandatory[variantName]
             }
@@ -246,7 +249,7 @@ class HockeyAppUploadTask extends DefaultTask {
         }
     }
 
-
+    @Nullable
     def static getFile(String regex, File directory) {
         def pattern = Pattern.compile(regex)
 
@@ -258,7 +261,7 @@ class HockeyAppUploadTask extends DefaultTask {
                 [accept: { d, f -> f ==~ pattern }] as FilenameFilter
         ).toList()
 
-        if (fileList == null || fileList.size() == 0) {
+        if (!fileList) {
             return null
         }
         return new File(directory, fileList[0])

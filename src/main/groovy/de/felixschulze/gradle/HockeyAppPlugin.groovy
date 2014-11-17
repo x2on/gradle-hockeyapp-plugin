@@ -52,17 +52,14 @@ class HockeyAppPlugin implements Plugin<Project> {
                 HockeyAppUploadTask task = project.tasks.create("upload${variant.name.capitalize()}ToHockeyApp", HockeyAppUploadTask)
                 task.group = 'HockeyApp'
                 task.description = "Upload '${variant.name}' to HockeyApp"
-                task.applicationFile = variant.outputFile
-                File symbolsDirectory = variant.getProcessResources().textSymbolOutputDir
+                task.applicationFile = variant.outputs[0].outputFile
 
                 if (variant.getObfuscation()) {
-                    String flavorFilePart = ""
-                    if (variant.getFlavorName().length() > 0) {
-                        flavorFilePart = "${variant.getFlavorName()}/"
-                    }
-                    symbolsDirectory = new File(project.buildDir, "outputs/proguard/${flavorFilePart}${variant.getBuildType().getName()}")
+                    task.mappingFile = variant.getMappingFile()
+                } else {
+                    task.mightHaveMapping = false
                 }
-                task.symbolsDirectory = symbolsDirectory
+
                 task.variantName = variant.name
                 task.outputs.upToDateWhen { false }
 

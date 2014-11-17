@@ -23,13 +23,13 @@ repositories {
 }
 
 dependencies {
-    groovy localGroovy()
+    compile localGroovy()
     compile gradleApi()
     compile 'commons-io:commons-io:2.+'
     compile 'commons-configuration:commons-configuration:1.8+'
     compile 'org.apache.httpcomponents:httpclient:4.3+'
     compile 'org.apache.httpcomponents:httpmime:4.3+'
-    compile 'com.android.tools.build:gradle:0.11.+'
+    compile 'com.android.tools.build:gradle:0.13.+'
     compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.0.2+'
 }
 
