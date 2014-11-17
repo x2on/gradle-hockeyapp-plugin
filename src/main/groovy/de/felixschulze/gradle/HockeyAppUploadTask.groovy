@@ -223,7 +223,13 @@ class HockeyAppUploadTask extends DefaultTask {
         if (status) {
             entityBuilder.addPart("status", new StringBody(status))
         }
-        if (project.hockeyapp.releaseType) {
+        String releaseType = project.hockeyapp.releaseType
+        if (project.hockeyapp.variantToReleaseType) {
+            if (project.hockeyapp.variantToReleaseType[variantName]) {
+                releaseType = project.hockeyapp.variantToReleaseType[variantName]
+            }
+        }
+        if (releaseType) {
             entityBuilder.addPart("release_type", new StringBody(project.hockeyapp.releaseType))
         }
         if (project.hockeyapp.commitSha) {
