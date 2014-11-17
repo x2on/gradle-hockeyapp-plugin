@@ -35,6 +35,7 @@ class HockeyAppPluginExtension {
     def String notify = 0
     def String notesType = 1
     def String releaseType = 0
+    def Map<String, String> variantToReleaseType = null
     def String appFileNameRegex = null
     def String mappingFileNameRegex = "mapping.txt"
     def String commitSha = null
