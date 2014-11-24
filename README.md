@@ -1,6 +1,6 @@
 # gradle-hockeyapp-plugin [![Build Status](https://travis-ci.org/x2on/gradle-hockeyapp-plugin.png)](https://travis-ci.org/x2on/gradle-hockeyapp-plugin) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.felixschulze.gradle/gradle-hockeyapp-plugin/badge.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22de.felixschulze.gradle%22%20AND%20a%3A%22gradle-hockeyapp-plugin%22) [![License MIT](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/x2on/gradle-hockeyapp-plugin/blob/master/LICENSE)
 
-A Gradle plugin for uploading iOS and Android Apps to HockeyApp. 
+A Gradle plugin for uploading iOS and Android Apps to HockeyApp.
 
 ## Basic usage
 
@@ -45,6 +45,7 @@ hockeyapp {
 * `apiToken`: Your API Token from [HockeyApp](http://hockeyapp.net/)
 
 ### Optional
+* `variantToApiToken`: Optional: `[variantName: "YOURHOCKEYAPPTOKEN", variantName2: "YOUROTHERHOCKEYAPPTOKEN"]` map between your variants and api tokens
 * `releaseType`: `0` beta, `1` live, `2` alpha
 * `variantToReleaseType`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and releaseType
 * `notify`: `0` not notify testers, `1` notify all testers that can install this app

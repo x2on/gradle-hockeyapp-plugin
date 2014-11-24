@@ -30,6 +30,7 @@ class HockeyAppPluginExtension {
     def Object outputDirectory
     def File symbolsDirectory = null
     def String apiToken = null
+    def Map<String, String> variantToApiToken = null
     def String notes = "This build was uploaded using the gradle-hockeyapp-plugin"
     def String status = 2
     def String notify = 0

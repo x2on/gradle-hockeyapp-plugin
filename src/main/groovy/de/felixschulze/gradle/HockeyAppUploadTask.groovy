@@ -64,7 +64,7 @@ class HockeyAppUploadTask extends DefaultTask {
     @TaskAction
     def upload() throws IOException {
 
-        if (!project.hockeyapp.apiToken) {
+        if (!getApiToken()) {
             throw new IllegalArgumentException("Cannot upload to HockeyApp because API Token is missing")
         }
 
@@ -142,7 +142,7 @@ class HockeyAppUploadTask extends DefaultTask {
         }
         decorateWithOptionalProperties(entityBuilder)
 
-        httpPost.addHeader("X-HockeyAppToken", project.hockeyapp.apiToken)
+        httpPost.addHeader("X-HockeyAppToken", getApiToken())
 
 
         int lastProgress = 0
@@ -256,6 +256,16 @@ class HockeyAppUploadTask extends DefaultTask {
         if (mandatory){
             entityBuilder.addPart("mandatory", new StringBody(mandatory))
         }
+    }
+
+    private String getApiToken() {
+        String apiToken = project.hockeyapp.apiToken
+        if (project.hockeyapp.variantToApiToken) {
+            if (project.hockeyapp.variantToApiToken[variantName]) {
+                apiToken = project.hockeyapp.variantToApiToken[variantName]
+            }
+        }
+        return apiToken
     }
 
     @Nullable
