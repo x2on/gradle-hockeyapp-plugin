@@ -13,6 +13,10 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'release'
 
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
+
+
 group = 'de.felixschulze.gradle'
 
 ext.archivesBaseName = 'gradle-hockeyapp-plugin'
@@ -29,7 +33,7 @@ dependencies {
     compile 'commons-configuration:commons-configuration:1.8+'
     compile 'org.apache.httpcomponents:httpclient:4.3+'
     compile 'org.apache.httpcomponents:httpmime:4.3+'
-    compile 'com.android.tools.build:gradle:0.13.+'
+    compile 'com.android.tools.build:gradle:0.14.+'
     compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.0.2+'
 }
 

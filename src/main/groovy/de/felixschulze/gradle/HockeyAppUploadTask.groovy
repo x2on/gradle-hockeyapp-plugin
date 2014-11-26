@@ -208,11 +208,23 @@ class HockeyAppUploadTask extends DefaultTask {
         if (project.hockeyapp.notify) {
             entityBuilder.addPart("notify", new StringBody(project.hockeyapp.notify))
         }
-        if (project.hockeyapp.notesType) {
-            entityBuilder.addPart("notes_type", new StringBody(project.hockeyapp.notesType))
+        String notesType = project.hockeyapp.notesType
+        if(project.hockeyapp.variantToNotesType){
+        	if(project.hockeyapp.variantToNotesType[variantName]){
+        		notesType = project.hockeyapp.variantToNotesType[variantName]
+        	}
         }
-        if (project.hockeyapp.notes) {
-            entityBuilder.addPart("notes", new StringBody(project.hockeyapp.notes))
+        if (notesType) {
+            entityBuilder.addPart("notes_type", new StringBody(notesType))
+        }
+        String notes = project.hockeyapp.notes
+        if(project.hockeyapp.variantToNotes){
+        	if(project.hockeyapp.variantToNotes[variantName]){
+        		notes = project.hockeyapp.variantToNotes[variantName]
+        	}
+        }
+        if (notes) {
+            entityBuilder.addPart("notes", new StringBody(notes))
         }
         String status = project.hockeyapp.status
         if (project.hockeyapp.variantToStatus) {
