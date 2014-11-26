@@ -13,6 +13,10 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'release'
 
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
+
+
 group = 'de.felixschulze.gradle'
 
 ext.archivesBaseName = 'gradle-hockeyapp-plugin'
