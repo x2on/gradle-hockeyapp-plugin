@@ -52,7 +52,9 @@ hockeyapp {
 * `status`: `1` not allow users to download the version, `2` make the version available for download
 * `variantToStatus`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and status
 * `notes`: Release notes as Textile or Markdown
+* `variantToNotes` : Optional: `[variantName: "some notes", variantName2: "some other Notes"]` map between your variants and notes
 * `notesType`: `0` Textile, `1` Markdown
+* `variantToNotesType` : Optional: `[variantName: "0", variantName2: "1"]` map between your variants and notesType
 * `mandatory`: `0` not mandatory, `1` mandatory
 * `variantToMandatory`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and mandatory
 * `mappingFileNameRegex`:  Optional: `mappingFileNameRegex="mapping.txt"` Should contain the filename or a regex for the proguard `mapping.txt` mapping file (Android) or `dSYM` file (iOS). Standard is `mapping.txt`
