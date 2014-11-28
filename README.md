@@ -12,7 +12,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:2.3+'
+        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:2.4+'
     }
 }
 
