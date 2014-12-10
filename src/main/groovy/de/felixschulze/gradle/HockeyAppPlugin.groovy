@@ -25,6 +25,7 @@
 package de.felixschulze.gradle
 
 import com.android.build.gradle.api.ApplicationVariant
+import org.apache.commons.io.FilenameUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import com.android.build.gradle.AppExtension
@@ -52,7 +53,14 @@ class HockeyAppPlugin implements Plugin<Project> {
                 HockeyAppUploadTask task = project.tasks.create("upload${variant.name.capitalize()}ToHockeyApp", HockeyAppUploadTask)
                 task.group = 'HockeyApp'
                 task.description = "Upload '${variant.name}' to HockeyApp"
-                task.applicationFile = variant.outputs[0].outputFile
+
+                // Get the first output apk file
+                variant.outputs.each {
+                    if (FilenameUtils.isExtension(it.outputFile.getName(),"apk")) {
+                        task.applicationFile = it.outputFile
+                        return true
+                    }
+                }
 
                 if (variant.getObfuscation()) {
                     task.mappingFile = variant.getMappingFile()
