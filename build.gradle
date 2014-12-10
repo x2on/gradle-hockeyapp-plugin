@@ -33,7 +33,7 @@ dependencies {
     compile 'commons-configuration:commons-configuration:1.8'
     compile 'org.apache.httpcomponents:httpclient:4.3.6'
     compile 'org.apache.httpcomponents:httpmime:4.3.6'
-    compile 'com.android.tools.build:gradle:[0.14,0.15)'
+    compile 'com.android.tools.build:gradle:1.0.0'
     compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.0.2'
 }
 
