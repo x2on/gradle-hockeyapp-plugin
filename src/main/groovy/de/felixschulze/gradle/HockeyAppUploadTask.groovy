@@ -282,11 +282,19 @@ class HockeyAppUploadTask extends DefaultTask {
 
     @Nullable
     def static getFile(String regex, File directory) {
-        def pattern = Pattern.compile(regex)
+        if (!regex) {
+            throw new IllegalArgumentException("No appFileNameRegex provided.")
+        }
+
+        if (!directory) {
+            throw new IllegalArgumentException("No outputDirectory provided")
+        }
 
         if (!directory.exists()) {
-            return null
+            throw new IllegalArgumentException("The outputDirectory (" + directory.absolutePath + ")doesn't exists")
         }
+
+        def pattern = Pattern.compile(regex)
 
         def fileList = directory.list(
                 [accept: { d, f -> f ==~ pattern }] as FilenameFilter
