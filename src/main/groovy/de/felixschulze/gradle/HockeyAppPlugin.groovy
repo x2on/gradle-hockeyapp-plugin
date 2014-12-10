@@ -53,21 +53,7 @@ class HockeyAppPlugin implements Plugin<Project> {
                 HockeyAppUploadTask task = project.tasks.create("upload${variant.name.capitalize()}ToHockeyApp", HockeyAppUploadTask)
                 task.group = 'HockeyApp'
                 task.description = "Upload '${variant.name}' to HockeyApp"
-
-                // Get the first output apk file
-                variant.outputs.each {
-                    if (FilenameUtils.isExtension(it.outputFile.getName(),"apk")) {
-                        task.applicationFile = it.outputFile
-                        return true
-                    }
-                }
-
-                if (variant.getObfuscation()) {
-                    task.mappingFile = variant.getMappingFile()
-                } else {
-                    task.mightHaveMapping = false
-                }
-
+                task.applicationVariant = variant
                 task.variantName = variant.name
                 task.outputs.upToDateWhen { false }
 

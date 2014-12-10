@@ -24,10 +24,12 @@
 
 package de.felixschulze.gradle
 
+import com.android.build.gradle.api.ApplicationVariant
 import de.felixschulze.gradle.util.ProgressHttpEntityWrapper
 import de.felixschulze.teamcity.TeamCityProgressType
 import de.felixschulze.teamcity.TeamCityStatusMessageHelper
 import groovy.json.JsonSlurper
+import org.apache.commons.io.FilenameUtils
 import org.apache.http.HttpHost
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
@@ -52,6 +54,7 @@ class HockeyAppUploadTask extends DefaultTask {
     File symbolsDirectory
     File mappingFile
     String variantName
+    ApplicationVariant applicationVariant
     boolean mightHaveMapping = true   // Specify otherwise in Android config
 
 
@@ -63,6 +66,21 @@ class HockeyAppUploadTask extends DefaultTask {
 
     @TaskAction
     def upload() throws IOException {
+
+
+        // Get the first output apk file
+        applicationVariant.outputs.each {
+            if (FilenameUtils.isExtension(it.outputFile.getName(),"apk")) {
+                applicationFile = it.outputFile
+                return true
+            }
+        }
+
+        if (applicationVariant.getObfuscation()) {
+            mappingFile = applicationVariant.getMappingFile()
+        } else {
+            mightHaveMapping = false
+        }
 
         if (!getApiToken()) {
             throw new IllegalArgumentException("Cannot upload to HockeyApp because API Token is missing")
