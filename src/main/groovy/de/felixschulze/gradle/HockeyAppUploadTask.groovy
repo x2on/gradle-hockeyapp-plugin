@@ -87,6 +87,12 @@ class HockeyAppUploadTask extends DefaultTask {
         }
 
         if (!applicationFile?.exists()) {
+            if (!project.hockeyapp.appFileNameRegex) {
+                throw new IllegalArgumentException("No applicationFile found or no appFileNameRegex provided.")
+            }
+            if (!project.hockeyapp.outputDirectory || !project.hockeyapp.outputDirectory.exists()) {
+                throw new IllegalArgumentException("The outputDirectory (" + project.hockeyapp.outputDirectory ? project.hockeyapp.outputDirectory.absolutePath : " not defined " + ") doesn't exists")
+            }
             applicationFile = getFile(project.hockeyapp.appFileNameRegex, project.hockeyapp.outputDirectory);
             if (!applicationFile) {
                 throw new IllegalStateException("No app file found in directory " + project.hockeyapp.outputDirectory.absolutePath)
@@ -300,16 +306,8 @@ class HockeyAppUploadTask extends DefaultTask {
 
     @Nullable
     def static getFile(String regex, File directory) {
-        if (!regex) {
-            throw new IllegalArgumentException("No appFileNameRegex provided.")
-        }
-
-        if (!directory) {
-            throw new IllegalArgumentException("No outputDirectory provided")
-        }
-
-        if (!directory.exists()) {
-            throw new IllegalArgumentException("The outputDirectory (" + directory.absolutePath + ")doesn't exists")
+        if (!regex || !directory || !directory.exists()) {
+            return null
         }
 
         def pattern = Pattern.compile(regex)
