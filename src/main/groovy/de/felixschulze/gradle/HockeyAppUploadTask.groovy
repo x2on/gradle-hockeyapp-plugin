@@ -198,7 +198,7 @@ class HockeyAppUploadTask extends DefaultTask {
         HttpResponse response = httpClient.execute(httpPost)
 
         if (response.getStatusLine().getStatusCode() != 201) {
-            if (response.getEntity() && response.getEntity().getContentLength() > 0) {
+            if (response.getEntity()?.getContentLength() > 0) {
                 InputStreamReader reader = new InputStreamReader(response.getEntity().content)
                 def uploadResponse = new JsonSlurper().parse(reader)
                 reader.close()
