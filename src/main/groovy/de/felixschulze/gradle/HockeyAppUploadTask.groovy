@@ -56,6 +56,7 @@ class HockeyAppUploadTask extends DefaultTask {
     String variantName
     ApplicationVariant applicationVariant
     boolean mightHaveMapping = true   // Specify otherwise in Android config
+    HockeyAppPluginExtension hockeyApp
 
 
     HockeyAppUploadTask() {
@@ -66,6 +67,8 @@ class HockeyAppUploadTask extends DefaultTask {
 
     @TaskAction
     def upload() throws IOException {
+
+        hockeyApp = project.hockeyapp
 
         // Get the first output apk file if android
         if (applicationVariant) {
@@ -88,15 +91,15 @@ class HockeyAppUploadTask extends DefaultTask {
         }
 
         if (!applicationFile?.exists()) {
-            if (!project.hockeyapp.appFileNameRegex) {
+            if (!hockeyApp.appFileNameRegex) {
                 throw new IllegalArgumentException("No applicationFile found or no appFileNameRegex provided.")
             }
-            if (!project.hockeyapp.outputDirectory || !project.hockeyapp.outputDirectory.exists()) {
-                throw new IllegalArgumentException("The outputDirectory (" + project.hockeyapp.outputDirectory ? project.hockeyapp.outputDirectory.absolutePath : " not defined " + ") doesn't exists")
+            if (!hockeyApp.outputDirectory || !hockeyApp.outputDirectory.exists()) {
+                throw new IllegalArgumentException("The outputDirectory (" + hockeyApp.outputDirectory ? hockeyApp.outputDirectory.absolutePath : " not defined " + ") doesn't exists")
             }
-            applicationFile = getFile(project.hockeyapp.appFileNameRegex, project.hockeyapp.outputDirectory);
+            applicationFile = getFile(hockeyApp.appFileNameRegex, hockeyApp.outputDirectory);
             if (!applicationFile) {
-                throw new IllegalStateException("No app file found in directory " + project.hockeyapp.outputDirectory.absolutePath)
+                throw new IllegalStateException("No app file found in directory " + hockeyApp.outputDirectory.absolutePath)
             }
         }
 
@@ -104,9 +107,9 @@ class HockeyAppUploadTask extends DefaultTask {
 
         // Retrieve mapping file if not using Android Gradle Plugin
         // Requires it to be set in the project config
-        if (mightHaveMapping && !mappingFile && project.hockeyapp.symbolsDirectory?.exists()) {
-            symbolsDirectory = project.hockeyapp.symbolsDirectory
-            mappingFile = getFile(project.hockeyapp.mappingFileNameRegex, symbolsDirectory);
+        if (mightHaveMapping && !mappingFile && hockeyApp.symbolsDirectory?.exists()) {
+            symbolsDirectory = hockeyApp.symbolsDirectory
+            mappingFile = getFile(hockeyApp.mappingFileNameRegex, symbolsDirectory);
 
             if (!mappingFile) {
                 logger.warn("No Mapping file found.")
@@ -118,8 +121,8 @@ class HockeyAppUploadTask extends DefaultTask {
         }
 
         String appId = null
-        if (project.hockeyapp.variantToApplicationId) {
-            appId = project.hockeyapp.variantToApplicationId[variantName]
+        if (hockeyApp.variantToApplicationId) {
+            appId = hockeyApp.variantToApplicationId[variantName]
             if (!appId)
                 throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
         }
@@ -131,13 +134,13 @@ class HockeyAppUploadTask extends DefaultTask {
 
         ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation(this.getClass())
         progressLogger.start("Upload file to Hockey App", "Upload file")
-        if (project.hockeyapp.teamCityLog) {
+        if (hockeyApp.teamCityLog) {
             println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.START, "Upload file to Hockey App")
         }
 
         RequestConfig.Builder requestBuilder = RequestConfig.custom()
-        requestBuilder = requestBuilder.setConnectTimeout(project.hockeyapp.timeout)
-        requestBuilder = requestBuilder.setConnectionRequestTimeout(project.hockeyapp.timeout)
+        requestBuilder = requestBuilder.setConnectTimeout(hockeyApp.timeout)
+        requestBuilder = requestBuilder.setConnectionRequestTimeout(hockeyApp.timeout)
 
         String proxyHost = System.getProperty("http.proxyHost", "")
         int proxyPort = System.getProperty("http.proxyPort", "0") as int
@@ -172,7 +175,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
         int lastProgress = 0
         Logger loggerForCallback = logger
-        Boolean teamCityLog = project.hockeyapp.teamCityLog
+        Boolean teamCityLog = hockeyApp.teamCityLog
         ProgressHttpEntityWrapper.ProgressCallback progressCallback = new ProgressHttpEntityWrapper.ProgressCallback() {
 
             @Override
@@ -222,7 +225,7 @@ class HockeyAppUploadTask extends DefaultTask {
                     logger.debug(" upload response: " + uploadResponse)
                 }
             }
-            if (project.hockeyapp.teamCityLog) {
+            if (hockeyApp.teamCityLog) {
                 println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.FINISH, "Application uploaded successfully.")
             }
             progressLogger.completed()
@@ -230,64 +233,64 @@ class HockeyAppUploadTask extends DefaultTask {
     }
 
     private void decorateWithOptionalProperties(MultipartEntityBuilder entityBuilder) {
-        if (project.hockeyapp.notify) {
-            entityBuilder.addPart("notify", new StringBody(project.hockeyapp.notify))
+        if (hockeyApp.notify) {
+            entityBuilder.addPart("notify", new StringBody(hockeyApp.notify as String))
         }
-        String notesType = project.hockeyapp.notesType
-        if(project.hockeyapp.variantToNotesType){
-        	if(project.hockeyapp.variantToNotesType[variantName]){
-        		notesType = project.hockeyapp.variantToNotesType[variantName]
+        String notesType = hockeyApp.notesType
+        if(hockeyApp.variantToNotesType){
+        	if(hockeyApp.variantToNotesType[variantName]){
+        		notesType = hockeyApp.variantToNotesType[variantName]
         	}
         }
         if (notesType) {
             entityBuilder.addPart("notes_type", new StringBody(notesType))
         }
-        String notes = project.hockeyapp.notes
-        if(project.hockeyapp.variantToNotes){
-        	if(project.hockeyapp.variantToNotes[variantName]){
-        		notes = project.hockeyapp.variantToNotes[variantName]
+        String notes = hockeyApp.notes
+        if(hockeyApp.variantToNotes){
+        	if(hockeyApp.variantToNotes[variantName]){
+        		notes = hockeyApp.variantToNotes[variantName]
         	}
         }
         if (notes) {
             entityBuilder.addPart("notes", new StringBody(notes))
         }
-        String status = project.hockeyapp.status
-        if (project.hockeyapp.variantToStatus) {
-            if (project.hockeyapp.variantToStatus[variantName]){
-              status = project.hockeyapp.variantToStatus[variantName]
+        String status = hockeyApp.status
+        if (hockeyApp.variantToStatus) {
+            if (hockeyApp.variantToStatus[variantName]){
+              status = hockeyApp.variantToStatus[variantName]
             }
         }
         if (status) {
             entityBuilder.addPart("status", new StringBody(status))
         }
-        String releaseType = project.hockeyapp.releaseType
-        if (project.hockeyapp.variantToReleaseType) {
-            if (project.hockeyapp.variantToReleaseType[variantName]) {
-                releaseType = project.hockeyapp.variantToReleaseType[variantName]
+        String releaseType = hockeyApp.releaseType
+        if (hockeyApp.variantToReleaseType) {
+            if (hockeyApp.variantToReleaseType[variantName]) {
+                releaseType = hockeyApp.variantToReleaseType[variantName]
             }
         }
         if (releaseType) {
-            entityBuilder.addPart("release_type", new StringBody(project.hockeyapp.releaseType))
+            entityBuilder.addPart("release_type", new StringBody(hockeyApp.releaseType as String))
         }
-        if (project.hockeyapp.commitSha) {
-            entityBuilder.addPart("commit_sha", new StringBody(project.hockeyapp.commitSha))
+        if (hockeyApp.commitSha) {
+            entityBuilder.addPart("commit_sha", new StringBody(hockeyApp.commitSha))
         }
-        if (project.hockeyapp.buildServerUrl) {
-            entityBuilder.addPart("build_server_url", new StringBody(project.hockeyapp.buildServerUrl))
+        if (hockeyApp.buildServerUrl) {
+            entityBuilder.addPart("build_server_url", new StringBody(hockeyApp.buildServerUrl))
         }
-        if (project.hockeyapp.repositoryUrl) {
-            entityBuilder.addPart("repository_url", new StringBody(project.hockeyapp.repositoryUrl))
+        if (hockeyApp.repositoryUrl) {
+            entityBuilder.addPart("repository_url", new StringBody(hockeyApp.repositoryUrl))
         }
-        if (project.hockeyapp.tags) {
-            entityBuilder.addPart("tags", new StringBody(project.hockeyapp.tags))
+        if (hockeyApp.tags) {
+            entityBuilder.addPart("tags", new StringBody(hockeyApp.tags))
         }
-        if (project.hockeyapp.teams) {
-            entityBuilder.addPart("teams", new StringBody(project.hockeyapp.teams))
+        if (hockeyApp.teams) {
+            entityBuilder.addPart("teams", new StringBody(hockeyApp.teams))
         }
-        String mandatory = project.hockeyapp.mandatory
-        if (project.hockeyapp.variantToMandatory){
-            if (project.hockeyapp.variantToMandatory[variantName]){
-              mandatory = project.hockeyapp.variantToMandatory[variantName]
+        String mandatory = hockeyApp.mandatory
+        if (hockeyApp.variantToMandatory){
+            if (hockeyApp.variantToMandatory[variantName]){
+              mandatory = hockeyApp.variantToMandatory[variantName]
             }
         }
         if (mandatory){
@@ -296,10 +299,10 @@ class HockeyAppUploadTask extends DefaultTask {
     }
 
     private String getApiToken() {
-        String apiToken = project.hockeyapp.apiToken
-        if (project.hockeyapp.variantToApiToken) {
-            if (project.hockeyapp.variantToApiToken[variantName]) {
-                apiToken = project.hockeyapp.variantToApiToken[variantName]
+        String apiToken = hockeyApp.apiToken
+        if (hockeyApp.variantToApiToken) {
+            if (hockeyApp.variantToApiToken[variantName]) {
+                apiToken = hockeyApp.variantToApiToken[variantName]
             }
         }
         return apiToken
