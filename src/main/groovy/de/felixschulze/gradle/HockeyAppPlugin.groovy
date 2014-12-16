@@ -38,11 +38,11 @@ class HockeyAppPlugin implements Plugin<Project> {
         applyTasks(project)
     }
 
-    void applyExtensions(final Project project) {
+    static void applyExtensions(final Project project) {
         project.extensions.create('hockeyapp', HockeyAppPluginExtension, project)
     }
 
-    void applyTasks(final Project project) {
+    static void applyTasks(final Project project) {
 
         if (!project.plugins.hasPlugin(AppPlugin)) {
             project.task('uploadToHockeyApp', type: HockeyAppUploadTask, group: 'HockeyApp')
