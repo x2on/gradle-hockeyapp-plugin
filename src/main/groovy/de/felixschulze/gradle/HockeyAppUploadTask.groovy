@@ -67,19 +67,20 @@ class HockeyAppUploadTask extends DefaultTask {
     @TaskAction
     def upload() throws IOException {
 
-
-        // Get the first output apk file
-        applicationVariant.outputs.each {
-            if (FilenameUtils.isExtension(it.outputFile.getName(),"apk")) {
-                applicationFile = it.outputFile
-                return true
+        // Get the first output apk file if android
+        if (applicationVariant) {
+            applicationVariant.outputs.each {
+                if (FilenameUtils.isExtension(it.outputFile.getName(), "apk")) {
+                    applicationFile = it.outputFile
+                    return true
+                }
             }
-        }
 
-        if (applicationVariant.getObfuscation()) {
-            mappingFile = applicationVariant.getMappingFile()
-        } else {
-            mightHaveMapping = false
+            if (applicationVariant.getObfuscation()) {
+                mappingFile = applicationVariant.getMappingFile()
+            } else {
+                mightHaveMapping = false
+            }
         }
 
         if (!getApiToken()) {
