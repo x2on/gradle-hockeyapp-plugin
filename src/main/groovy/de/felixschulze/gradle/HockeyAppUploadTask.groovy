@@ -112,7 +112,7 @@ class HockeyAppUploadTask extends DefaultTask {
             }
         }
 
-        if (mappingFile) {
+        if (mappingFile?.exists()) {
             logger.lifecycle("Mapping file: " + mappingFile.absolutePath)
         }
 
@@ -161,7 +161,7 @@ class HockeyAppUploadTask extends DefaultTask {
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create()
 
         entityBuilder.addPart("ipa", new FileBody(appFile))
-        if (mappingFile) {
+        if (mappingFile?.exists()) {
             entityBuilder.addPart("dsym", new FileBody(mappingFile))
         }
         decorateWithOptionalProperties(entityBuilder)
