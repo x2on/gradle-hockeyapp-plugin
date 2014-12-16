@@ -55,7 +55,7 @@ class HockeyAppUploadTask extends DefaultTask {
     File mappingFile
     String variantName
     ApplicationVariant applicationVariant
-    boolean mightHaveMapping = true   // Specify otherwise in Android config
+    boolean mappingFileCouldBePresent = true
     HockeyAppPluginExtension hockeyApp
 
 
@@ -82,7 +82,7 @@ class HockeyAppUploadTask extends DefaultTask {
             if (applicationVariant.getObfuscation()) {
                 mappingFile = applicationVariant.getMappingFile()
             } else {
-                mightHaveMapping = false
+                mappingFileCouldBePresent = false
             }
         }
 
@@ -107,7 +107,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
         // Retrieve mapping file if not using Android Gradle Plugin
         // Requires it to be set in the project config
-        if (mightHaveMapping && !mappingFile && hockeyApp.symbolsDirectory?.exists()) {
+        if (mappingFileCouldBePresent && !mappingFile && hockeyApp.symbolsDirectory?.exists()) {
             symbolsDirectory = hockeyApp.symbolsDirectory
             mappingFile = getFile(hockeyApp.mappingFileNameRegex, symbolsDirectory);
 
