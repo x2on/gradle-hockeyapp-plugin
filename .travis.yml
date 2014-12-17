@@ -1,6 +1,6 @@
 language: groovy
 
-install: ./gradlew clean assemble
+install: ./gradlew clean test assemble
 
 branches:
   only:

@@ -37,6 +37,12 @@ dependencies {
     compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.0.2'
 }
 
+test {
+    testLogging {
+        showStandardStreams = true
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+}
 
 task sourceJar(type: Jar) {
     description = 'An archive of the source code for Maven Central'
