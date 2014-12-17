@@ -25,6 +25,7 @@
 package de.felixschulze.gradle
 
 import com.android.build.gradle.api.ApplicationVariant
+import de.felixschulze.gradle.util.FileHelper
 import de.felixschulze.gradle.util.ProgressHttpEntityWrapper
 import de.felixschulze.teamcity.TeamCityProgressType
 import de.felixschulze.teamcity.TeamCityStatusMessageHelper
@@ -45,8 +46,6 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.TaskAction
 import org.gradle.logging.ProgressLogger
 import org.gradle.logging.ProgressLoggerFactory
-
-import java.util.regex.Pattern
 
 class HockeyAppUploadTask extends DefaultTask {
 
@@ -97,7 +96,7 @@ class HockeyAppUploadTask extends DefaultTask {
             if (!hockeyApp.outputDirectory || !hockeyApp.outputDirectory.exists()) {
                 throw new IllegalArgumentException("The outputDirectory (" + hockeyApp.outputDirectory ? hockeyApp.outputDirectory.absolutePath : " not defined " + ") doesn't exists")
             }
-            applicationFile = getFile(hockeyApp.appFileNameRegex, hockeyApp.outputDirectory);
+            applicationFile = FileHelper.getFile(hockeyApp.appFileNameRegex, hockeyApp.outputDirectory);
             if (!applicationFile) {
                 throw new IllegalStateException("No app file found in directory " + hockeyApp.outputDirectory.absolutePath)
             }
@@ -109,7 +108,7 @@ class HockeyAppUploadTask extends DefaultTask {
         // Requires it to be set in the project config
         if (mappingFileCouldBePresent && !mappingFile && hockeyApp.symbolsDirectory?.exists()) {
             symbolsDirectory = hockeyApp.symbolsDirectory
-            mappingFile = getFile(hockeyApp.mappingFileNameRegex, symbolsDirectory);
+            mappingFile = FileHelper.getFile(hockeyApp.mappingFileNameRegex, symbolsDirectory);
 
             if (!mappingFile) {
                 logger.warn("No Mapping file found.")
@@ -306,24 +305,6 @@ class HockeyAppUploadTask extends DefaultTask {
             }
         }
         return apiToken
-    }
-
-    @Nullable
-    def static getFile(String regex, File directory) {
-        if (!regex || !directory || !directory.exists()) {
-            return null
-        }
-
-        def pattern = Pattern.compile(regex)
-
-        def fileList = directory.list(
-                [accept: { d, f -> f ==~ pattern }] as FilenameFilter
-        ).toList()
-
-        if (!fileList) {
-            return null
-        }
-        return new File(directory, fileList[0])
     }
 
 
