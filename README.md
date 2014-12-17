@@ -12,11 +12,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:2.5+'
+        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.0'
     }
 }
 
-apply plugin: 'hockeyApp'
+apply plugin: 'de.felixschulze.gradle.hockeyapp'
 hockeyapp {
     apiToken = "YOURHOCKEYAPPTOKEN"
 }
