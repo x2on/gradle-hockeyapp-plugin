@@ -68,6 +68,18 @@ hockeyapp {
 * `repositoryUrl`: Optional: your source repository URL
 * `teamCityLog`: `true` Add features for [TeamCity](http://www.jetbrains.com/teamcity/)
 
+
+## Migration to >= 3.0
+
+To migrate to version >= 3.0 please change 
+```gradle
+apply plugin: 'hockeyApp'
+```
+to 
+```gradle
+apply plugin: 'de.felixschulze.gradle.hockeyapp'
+```
+
 ## Changelog
 
 [Releases](https://github.com/x2on/gradle-hockeyapp-plugin/releases)
