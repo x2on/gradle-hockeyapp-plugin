@@ -71,6 +71,8 @@ class HockeyAppUploadTask extends DefaultTask {
 
         // Get the first output apk file if android
         if (applicationVariant) {
+            logger.debug("Using android application variants")
+
             applicationVariant.outputs.each {
                 if (FilenameUtils.isExtension(it.outputFile.getName(), "apk")) {
                     applicationFile = it.outputFile
@@ -79,10 +81,15 @@ class HockeyAppUploadTask extends DefaultTask {
             }
 
             if (applicationVariant.getObfuscation()) {
+                logger.debug("Obfuscation is used")
                 mappingFile = applicationVariant.getMappingFile()
             } else {
+                logger.debug("Obfuscation is not used")
                 mappingFileCouldBePresent = false
             }
+        }
+        else {
+            logger.debug("Not using android application variants")
         }
 
         if (!getApiToken()) {
@@ -90,8 +97,11 @@ class HockeyAppUploadTask extends DefaultTask {
         }
 
         if (!applicationFile?.exists()) {
-            if (!hockeyApp.appFileNameRegex) {
-                throw new IllegalArgumentException("No applicationFile found or no appFileNameRegex provided.")
+            if (applicationFile) {
+                logger.debug("App file doesn't exist: "+applicationFile?.absolutePath)
+            }
+            if (!applicationVariant && !hockeyApp.appFileNameRegex) {
+                throw new IllegalArgumentException("No appFileNameRegex provided.")
             }
             if (!hockeyApp.outputDirectory || !hockeyApp.outputDirectory.exists()) {
                 throw new IllegalArgumentException("The outputDirectory (" + hockeyApp.outputDirectory ? hockeyApp.outputDirectory.absolutePath : " not defined " + ") doesn't exists")
