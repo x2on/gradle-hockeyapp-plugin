@@ -25,13 +25,17 @@
 package de.felixschulze.gradle
 
 import com.android.build.gradle.api.ApplicationVariant
-import org.apache.commons.io.FilenameUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 
+/**
+ * Main gradle-hockeyapp-plugin class
+ */
 class HockeyAppPlugin implements Plugin<Project> {
+
+    final static String GROUP_NAME = 'HockeyApp'
 
     void apply(Project project) {
         applyExtensions(project)
@@ -44,14 +48,12 @@ class HockeyAppPlugin implements Plugin<Project> {
 
     static void applyTasks(final Project project) {
 
-        if (!project.plugins.hasPlugin(AppPlugin)) {
-            project.task('uploadToHockeyApp', type: HockeyAppUploadTask, group: 'HockeyApp')
-        } else {
+        if (project.plugins.hasPlugin(AppPlugin)) {
             AppExtension android = project.android
             android.applicationVariants.all { ApplicationVariant variant ->
 
                 HockeyAppUploadTask task = project.tasks.create("upload${variant.name.capitalize()}ToHockeyApp", HockeyAppUploadTask)
-                task.group = 'HockeyApp'
+                task.group = GROUP_NAME
                 task.description = "Upload '${variant.name}' to HockeyApp"
                 task.applicationVariant = variant
                 task.variantName = variant.name
@@ -59,6 +61,8 @@ class HockeyAppPlugin implements Plugin<Project> {
 
                 task.dependsOn variant.assemble
             }
+        } else {
+            project.task('uploadToHockeyApp', type: HockeyAppUploadTask, group: GROUP_NAME)
         }
     }
 

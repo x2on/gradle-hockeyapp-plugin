@@ -26,6 +26,9 @@ package de.felixschulze.gradle
 
 import org.gradle.api.Project
 
+/**
+ * Extension for plugin config properties
+ */
 class HockeyAppPluginExtension {
     def Object outputDirectory
     def File symbolsDirectory = null

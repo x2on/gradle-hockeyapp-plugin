@@ -47,6 +47,9 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.logging.ProgressLogger
 import org.gradle.logging.ProgressLoggerFactory
 
+/**
+ * Upload task for plugin
+ */
 class HockeyAppUploadTask extends DefaultTask {
 
     File applicationFile
@@ -60,7 +63,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
     HockeyAppUploadTask() {
         super()
-        this.description = "Uploads the app (Android: (.apk, mapping.txt), iOS:(.ipa, .dsym)) to HockeyApp"
+        this.description = 'Uploads the app (Android: (.apk, mapping.txt), iOS:(.ipa, .dsym)) to HockeyApp'
     }
 
 
@@ -71,7 +74,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
         // Get the first output apk file if android
         if (applicationVariant) {
-            logger.debug("Using android application variants")
+            logger.debug('Using android application variants')
 
             applicationVariant.outputs.each {
                 if (FilenameUtils.isExtension(it.outputFile.getName(), "apk")) {
@@ -81,15 +84,15 @@ class HockeyAppUploadTask extends DefaultTask {
             }
 
             if (applicationVariant.getObfuscation()) {
-                logger.debug("Obfuscation is used")
+                logger.debug('Obfuscation is used')
                 mappingFile = applicationVariant.getMappingFile()
             } else {
-                logger.debug("Obfuscation is not used")
+                logger.debug('Obfuscation is not used')
                 mappingFileCouldBePresent = false
             }
         }
         else {
-            logger.debug("Not using android application variants")
+            logger.debug('Not using android application variants')
         }
 
         if (!getApiToken()) {
@@ -132,14 +135,15 @@ class HockeyAppUploadTask extends DefaultTask {
         String appId = null
         if (hockeyApp.variantToApplicationId) {
             appId = hockeyApp.variantToApplicationId[variantName]
-            if (!appId)
+            if (!appId) {
                 throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
+            }
         }
 
-        uploadApp(applicationFile, mappingFile, appId)
+        uploadAppplicationFileToHockeyApp(applicationFile, mappingFile, appId)
     }
 
-    def void uploadApp(File appFile, @Nullable File mappingFile, String appId) {
+    def void uploadAppplicationFileToHockeyApp(File appFile, @Nullable File mappingFile, String appId) {
 
         ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation(this.getClass())
         progressLogger.start("Upload file to Hockey App", "Upload file")
