@@ -101,6 +101,10 @@ release {
     createReleaseTag.dependsOn uploadArchives
 }
 
+codenarc {
+    ignoreFailures = true
+}
+
 /**v
  * Create POM config and return for use by other tasks.
  */
