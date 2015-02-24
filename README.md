@@ -18,7 +18,7 @@ buildscript {
 
 apply plugin: 'de.felixschulze.gradle.hockeyapp'
 hockeyapp {
-    apiToken = "YOURHOCKEYAPPTOKEN"
+    apiToken = "YOURHOCKEYAPITOKEN"
 }
 ```
 
@@ -28,7 +28,7 @@ Add to your build.gradle
 
 ```gradle
 hockeyapp {
-    apiToken = "YOURHOCKEYAPPTOKEN"
+    apiToken = "YOURHOCKEYAPITOKEN"
     releaseType = 2 // alpha
     notify = 0
     status = 2
@@ -45,7 +45,7 @@ hockeyapp {
 * `apiToken`: Your API Token from [HockeyApp](http://hockeyapp.net/)
 
 ### Optional
-* `variantToApiToken`: Optional: `[variantName: "YOURHOCKEYAPPTOKEN", variantName2: "YOUROTHERHOCKEYAPPTOKEN"]` map between your variants and api tokens
+* `variantToApiToken`: Optional: `[variantName: "YOURHOCKEYAPITOKEN", variantName2: "YOUROTHERHOCKEYAPITOKEN"]` map between your variants and api tokens
 * `releaseType`: `0` beta, `1` live, `2` alpha
 * `variantToReleaseType`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and releaseType
 * `notify`: `0` not notify testers, `1` notify all testers that can install this app
