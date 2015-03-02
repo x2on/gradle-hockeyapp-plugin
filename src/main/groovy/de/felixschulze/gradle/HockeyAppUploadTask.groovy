@@ -215,6 +215,7 @@ class HockeyAppUploadTask extends DefaultTask {
         HttpResponse response = httpClient.execute(httpPost)
 
         if (response.getStatusLine().getStatusCode() != 201) {
+            logger.debug("Upload failed with status code: " + response.getStatusLine().getStatusCode())
             if (response.getEntity()?.getContentLength() > 0) {
                 InputStreamReader reader = new InputStreamReader(response.getEntity().content)
                 def uploadResponse = new JsonSlurper().parse(reader)
