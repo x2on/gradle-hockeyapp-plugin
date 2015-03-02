@@ -12,7 +12,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.0'
+        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.0.1'
     }
 }
 
@@ -69,7 +69,7 @@ hockeyapp {
 * `teamCityLog`: `true` Add features for [TeamCity](http://www.jetbrains.com/teamcity/)
 
 
-## Migration to >= 3.0
+## Migration from 2.x to >= 3.0
 
 To migrate to version >= 3.0 please change 
 ```gradle
