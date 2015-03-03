@@ -35,8 +35,8 @@ hockeyapp {
     notesType = 1
     notes = "Some notes."
     variantToApplicationId = [
-            BuildVariantA:  "applicationIdA",
-            BuildVariantB:  "applicationIdB",
+            BuildVariantA:  "hockeyAppapplicationIdA",
+            BuildVariantB:  "hockeyAppapplicationIdB",
     ]
 }
 
@@ -58,7 +58,7 @@ hockeyapp {
 * `mandatory`: `0` not mandatory, `1` mandatory
 * `variantToMandatory`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and mandatory
 * `mappingFileNameRegex`:  Optional: `mappingFileNameRegex="mapping.txt"` Should contain the filename or a regex for the proguard `mapping.txt` mapping file (Android) or `dSYM` file (iOS). Standard is `mapping.txt`
-* `variantToApplicationId`:  Optional (Android): `[variantName: "appId", variantName2: "appId2"]` map between your variants and application IDs
+* `variantToApplicationId`:  Optional (Android): `[variantName: "hockeyAppAppId", variantName2: "hockeyAppAppId2"]` map between your variants and HockeyApp application IDs
 * `symbolsDirectory`: Only needed for iOS or if you don't use the android gradle plugin: `file("directory")` Directory which contains the `R` or `dSYM` file
 * `appFileNameRegex`: Only needed for iOS or if you don't use the android gradle plugin `appFileNameRegex = ".*.ipa"
 * `outputDirectory`: Only needed for iOS: `file("directory")`
