@@ -233,8 +233,8 @@ class HockeyAppUploadTask extends DefaultTask {
                 }
                 reader.close()
                 if (uploadResponse) {
-                    logger.info(" application: " + uploadResponse.title?.toString() + " v" + uploadResponse.shortversion?.toString() + "(" + uploadResponse.version?.toString() + ")");
-                    logger.debug(" upload response: " + uploadResponse)
+                    logger.info("Upload information: Title: '" + uploadResponse.title?.toString() + "' Config url: '" + uploadResponse.config_url?.toString()) + "'";
+                    logger.debug("Upload response: " + uploadResponse.toString())
                 }
             }
             if (hockeyApp.teamCityLog) {
