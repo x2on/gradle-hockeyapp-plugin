@@ -33,6 +33,7 @@ import groovy.json.JsonSlurper
 import org.apache.commons.io.FilenameUtils
 import org.apache.http.HttpHost
 import org.apache.http.HttpResponse
+import org.apache.http.HttpStatus
 import org.apache.http.client.HttpClient
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpPost
@@ -214,28 +215,25 @@ class HockeyAppUploadTask extends DefaultTask {
 
         HttpResponse response = httpClient.execute(httpPost)
 
-        if (response.getStatusLine().getStatusCode() != 201) {
-            logger.debug("Upload failed with status code: " + response.getStatusLine().getStatusCode())
-            if (response.getEntity()?.getContentLength() > 0) {
-                InputStreamReader reader = new InputStreamReader(response.getEntity().content)
-                def uploadResponse = new JsonSlurper().parse(reader)
-                reader.close()
-                logger.debug("Upload response: " + uploadResponse)
-                if (uploadResponse && uploadResponse.status && uploadResponse.status.equals("error") && uploadResponse.message) {
-                    logger.error("Error response from HockeyApp: " + uploadResponse.message)
-                    throw new IllegalStateException("File upload failed: " + uploadResponse.message + " - Status: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
-                }
-            }
-            throw new IllegalStateException("File upload failed: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
+        logger.debug("Response status code: " + response.getStatusLine().getStatusCode())
+
+        if (response.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
+            parseResponseAndThrowError(response)
         }
         else {
             logger.lifecycle("Application uploaded successfully.")
             if (response.getEntity() && response.getEntity().getContentLength() > 0) {
                 InputStreamReader reader = new InputStreamReader(response.getEntity().content)
-                def uploadResponse = new JsonSlurper().parse(reader)
+                def uploadResponse = null
+                try {
+                    uploadResponse = new JsonSlurper().parse(reader)
+                }
+                catch (Exception e) {
+                    logger.error("Error while parsing JSON response: " + e.toString())
+                }
                 reader.close()
                 if (uploadResponse) {
-                    logger.info(" application: " + uploadResponse.title + " v" + uploadResponse.shortversion + "(" + uploadResponse.version + ")");
+                    logger.info(" application: " + uploadResponse.title?.toString() + " v" + uploadResponse.shortversion?.toString() + "(" + uploadResponse.version?.toString() + ")");
                     logger.debug(" upload response: " + uploadResponse)
                 }
             }
@@ -244,6 +242,39 @@ class HockeyAppUploadTask extends DefaultTask {
             }
             progressLogger.completed()
         }
+    }
+
+    private void parseResponseAndThrowError(HttpResponse response) {
+        if (response.getEntity()?.getContentLength() > 0) {
+            logger.debug("Response Content-Type: " + response.getFirstHeader("Content-type").getValue())
+            InputStreamReader reader = new InputStreamReader(response.getEntity().content)
+            Object uploadResponse = null
+            try {
+                uploadResponse = new JsonSlurper().parse(reader)
+            } catch (Exception e) {
+                logger.debug("Error while parsing JSON response: " + e.toString())
+            }
+            reader.close()
+
+            if (uploadResponse) {
+                logger.debug("Upload response: " + uploadResponse.toString())
+
+                if (uploadResponse.status && uploadResponse.status.equals("error") && uploadResponse.message) {
+                    logger.error("Error response from HockeyApp: " + uploadResponse.message.toString())
+                    throw new IllegalStateException("File upload failed: " + uploadResponse.message.toString() + " - Status: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase())
+                }
+                if (uploadResponse.errors?.credentials) {
+                    if (uploadResponse.errors.credentials instanceof ArrayList) {
+                        ArrayList credentialsError = uploadResponse.errors.credentials;
+                        if (!credentialsError.isEmpty()) {
+                            logger.error(credentialsError.get(0).toString())
+                            throw new IllegalStateException(credentialsError.get(0).toString())
+                        }
+                    }
+                }
+            }
+        }
+        throw new IllegalStateException("File upload failed: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
     }
 
     private void decorateWithOptionalProperties(MultipartEntityBuilder entityBuilder) {
