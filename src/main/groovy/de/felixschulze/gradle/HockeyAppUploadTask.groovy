@@ -168,9 +168,9 @@ class HockeyAppUploadTask extends DefaultTask {
         builder.setDefaultRequestConfig(requestBuilder.build());
         HttpClient httpClient = builder.build();
 
-        String uploadUrl = "https://rink.hockeyapp.net/api/2/apps"
+        String uploadUrl = hockeyApp.hockeyApiUrl
         if (appId) {
-            uploadUrl = "https://rink.hockeyapp.net/api/2/apps/${appId}/app_versions/upload"
+            uploadUrl = "${hockeyApp.hockeyApiUrl}/${appId}/app_versions/upload"
         }
 
         HttpPost httpPost = new HttpPost(uploadUrl)

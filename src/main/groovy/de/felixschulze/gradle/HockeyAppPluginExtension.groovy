@@ -55,6 +55,7 @@ class HockeyAppPluginExtension {
     def Map<String, String> variantToStatus = null
     def String mandatory = 0
     def Map<String, String> variantToMandatory = null
+    def String hockeyApiUrl = "https://rink.hockeyapp.net/api/2/apps"
 
 
     private final Project project
