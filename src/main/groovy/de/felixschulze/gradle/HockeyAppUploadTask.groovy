@@ -31,6 +31,7 @@ import de.felixschulze.teamcity.TeamCityProgressType
 import de.felixschulze.teamcity.TeamCityStatusMessageHelper
 import groovy.json.JsonSlurper
 import org.apache.commons.io.FilenameUtils
+import org.apache.http.Consts
 import org.apache.http.HttpHost
 import org.apache.http.HttpResponse
 import org.apache.http.HttpStatus
@@ -297,7 +298,7 @@ class HockeyAppUploadTask extends DefaultTask {
         	}
         }
         if (notes) {
-            entityBuilder.addPart("notes", new StringBody(notes))
+            entityBuilder.addPart("notes", new StringBody(notes, Consts.UTF_8))
         }
         String status = hockeyApp.status
         if (hockeyApp.variantToStatus) {
