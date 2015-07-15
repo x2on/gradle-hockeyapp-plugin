@@ -84,9 +84,9 @@ apply plugin: 'de.felixschulze.gradle.hockeyapp'
 
 [Releases](https://github.com/x2on/gradle-hockeyapp-plugin/releases)
 
-## Fix for Error with Top-Level-Projects
+## Fix for Error with Top-Level-Projects / Multi project environment
 
-If you use a top-level-project and got the error `java.lang.NoSuchFieldError: INSTANCE` move the dependency to this plugin to your root `build.gradle` file (see [#30](https://github.com/x2on/gradle-hockeyapp-plugin/issues/30))
+If you use a top-level-project or multi project environment and got the error `java.lang.NoSuchFieldError: INSTANCE` or `Could not initialize class org.apache.http.impl.conn.ManagedHttpClientConnectionFactory` move the dependency to this plugin to your root `build.gradle` file (see [#30](https://github.com/x2on/gradle-hockeyapp-plugin/issues/30), [#62](https://github.com/x2on/gradle-hockeyapp-plugin/issues/62))
 
 ## License
 
