@@ -138,11 +138,12 @@ class HockeyAppUploadTask extends DefaultTask {
         if (hockeyApp.variantToApplicationId) {
             appId = hockeyApp.variantToApplicationId[variantName]
             if (!appId) {
-                throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
+                logger.error("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
             }
         }
-
-        uploadAppplicationFileToHockeyApp(applicationFile, mappingFile, appId)
+        if(appId) {
+            uploadAppplicationFileToHockeyApp(applicationFile, mappingFile, appId)
+        }
     }
 
     def void uploadAppplicationFileToHockeyApp(File appFile, @Nullable File mappingFile, String appId) {
