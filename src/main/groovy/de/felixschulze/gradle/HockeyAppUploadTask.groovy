@@ -85,13 +85,7 @@ class HockeyAppUploadTask extends DefaultTask {
                 }
             }
 
-            if (applicationVariant.getObfuscation()) {
-                logger.debug('Obfuscation is used')
-                mappingFile = applicationVariant.getMappingFile()
-            } else {
-                logger.debug('Obfuscation is not used')
-                mappingFileCouldBePresent = false
-            }
+            mappingFile = applicationVariant.getMappingFile()
         }
         else {
             logger.debug('Not using android application variants')
