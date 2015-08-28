@@ -61,6 +61,7 @@ class HockeyAppUploadTask extends DefaultTask {
     ApplicationVariant applicationVariant
     boolean mappingFileCouldBePresent = true
     HockeyAppPluginExtension hockeyApp
+    String uploadAllPath
 
 
     HockeyAppUploadTask() {
@@ -138,7 +139,11 @@ class HockeyAppUploadTask extends DefaultTask {
         if (hockeyApp.variantToApplicationId) {
             appId = hockeyApp.variantToApplicationId[variantName]
             if (!appId) {
-                logger.error("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
+                if(project.getGradle().getTaskGraph().hasTask(uploadAllPath)) {
+                    logger.error("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
+                } else {
+                    throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
+                }
             }
         }
         if(appId) {
