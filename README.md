@@ -64,6 +64,8 @@ hockeyapp {
 * `outputDirectory`: Only needed for iOS: `file("directory")`
 * `teams`: Optional: restrict download to comma-separated list of team IDs; example teams 123, 213 with 123,213 being database ids of your teams
 * `tags`: Optional: restrict download to comma-separated list of tags
+* `users`: Optional: restrict download to comma-separated list of user IDs; example:
+					users=1224,5678 with 1224 and 5678 being the database IDs of your users
 * `commitSha`: Optional: commit SHA for this build
 * `buildServerUrl`: Optional: the URL of the build job on your build server
 * `repositoryUrl`: Optional: your source repository URL
