@@ -63,6 +63,8 @@ hockeyapp {
 * `appFileNameRegex`: Only needed for iOS or if you don't use the android gradle plugin `appFileNameRegex = ".*.ipa"
 * `outputDirectory`: Only needed for iOS: `file("directory")`
 * `tags`: Optional: restrict download to comma-separated list of tags
+* `users`: Optional: restrict download to comma-separated list of user IDs; example:
+					users=1224,5678 with 1224 and 5678 being the database IDs of your users
 * `commitSha`: Optional: commit SHA for this build
 * `buildServerUrl`: Optional: the URL of the build job on your build server
 * `repositoryUrl`: Optional: your source repository URL
