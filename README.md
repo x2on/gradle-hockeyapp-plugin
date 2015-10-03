@@ -62,6 +62,7 @@ hockeyapp {
 * `symbolsDirectory`: Only needed for iOS or if you don't use the android gradle plugin: `file("directory")` Directory which contains the `R` or `dSYM` file
 * `appFileNameRegex`: Only needed for iOS or if you don't use the android gradle plugin `appFileNameRegex = ".*.ipa"
 * `outputDirectory`: Only needed for iOS: `file("directory")`
+* `teams`: Optional: restrict download to comma-separated list of team IDs; example teams 123, 213 with 123,213 being database ids of your teams
 * `tags`: Optional: restrict download to comma-separated list of tags
 * `commitSha`: Optional: commit SHA for this build
 * `buildServerUrl`: Optional: the URL of the build job on your build server
