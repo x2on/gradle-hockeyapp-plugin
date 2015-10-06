@@ -46,7 +46,6 @@ hockeyapp {
 
 ### Optional
 
-* `appFileNameRegex`: Only needed for iOS or if you don't use the android gradle plugin `appFileNameRegex = ".*.ipa"
 * `buildServerUrl`: Optional: the URL of the build job on your build server
 * `commitSha`: Optional: commit SHA for this build
 * `mandatory`: `0` not mandatory, `1` mandatory
@@ -54,11 +53,9 @@ hockeyapp {
 * `notes`: Release notes as Textile or Markdown
 * `notesType`: `0` Textile, `1` Markdown
 * `notify`: `0` not notify testers, `1` notify all testers that can install this app
-* `outputDirectory`: Only needed for iOS: `file("directory")`
 * `releaseType`: `0` beta, `1` live, `2` alpha
 * `repositoryUrl`: Optional: your source repository URL
 * `status`: `1` not allow users to download the version, `2` make the version available for download
-* `symbolsDirectory`: Only needed for iOS or if you don't use the android gradle plugin: `file("directory")` Directory which contains the `R` or `dSYM` file
 * `tags`: Optional: restrict download to comma-separated list of tags
 * `teamCityLog`: `true` Add features for [TeamCity](http://www.jetbrains.com/teamcity/)
 * `teams`: Optional: restrict download to comma-separated list of team IDs; example teams 123, 213 with 123,213 being database ids of your teams
@@ -72,6 +69,10 @@ hockeyapp {
 * `variantToReleaseType`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and releaseType
 * `variantToStatus`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and status
 
+### iOS or custom Android build only options
+* `appFileNameRegex`: Only needed for iOS or if you don't use the android gradle plugin `appFileNameRegex = ".*.ipa"
+* `outputDirectory`: Only needed for iOS: `file("directory")`
+* `symbolsDirectory`: Only needed for iOS or if you don't use the android gradle plugin: `file("directory")` Directory which contains the `R` or `dSYM` file
 ## Migration from 2.x to >= 3.0
 
 To migrate to version >= 3.0 please change 
