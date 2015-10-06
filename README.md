@@ -12,7 +12,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.2'
+        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.3'
     }
 }
 
@@ -45,32 +45,32 @@ hockeyapp {
 * `apiToken`: Your API Token from [HockeyApp](http://hockeyapp.net/)
 
 ### Optional
-* `variantToApiToken`: Optional: `[variantName: "YOURHOCKEYAPITOKEN", variantName2: "YOUROTHERHOCKEYAPITOKEN"]` map between your variants and api tokens
-* `releaseType`: `0` beta, `1` live, `2` alpha
-* `variantToReleaseType`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and releaseType
-* `notify`: `0` not notify testers, `1` notify all testers that can install this app
-* `status`: `1` not allow users to download the version, `2` make the version available for download
-* `variantToStatus`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and status
-* `notes`: Release notes as Textile or Markdown
-* `variantToNotes` : Optional: `[variantName: "some notes", variantName2: "some other Notes"]` map between your variants and notes
-* `notesType`: `0` Textile, `1` Markdown
-* `variantToNotesType` : Optional: `[variantName: "0", variantName2: "1"]` map between your variants and notesType
-* `mandatory`: `0` not mandatory, `1` mandatory
-* `variantToMandatory`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and mandatory
-* `mappingFileNameRegex`:  Optional: `mappingFileNameRegex="mapping.txt"` Should contain the filename or a regex for the proguard `mapping.txt` mapping file (Android) or `dSYM` file (iOS). Standard is `mapping.txt`
-* `variantToApplicationId`:  Optional (Android): `[variantName: "hockeyAppAppId", variantName2: "hockeyAppAppId2"]` map between your variants and HockeyApp application IDs
-* `symbolsDirectory`: Only needed for iOS or if you don't use the android gradle plugin: `file("directory")` Directory which contains the `R` or `dSYM` file
+
 * `appFileNameRegex`: Only needed for iOS or if you don't use the android gradle plugin `appFileNameRegex = ".*.ipa"
+* `buildServerUrl`: Optional: the URL of the build job on your build server
+* `commitSha`: Optional: commit SHA for this build
+* `mandatory`: `0` not mandatory, `1` mandatory
+* `mappingFileNameRegex`:  Optional: `mappingFileNameRegex="mapping.txt"` Should contain the filename or a regex for the proguard `mapping.txt` mapping file (Android) or `dSYM` file (iOS). Standard is `mapping.txt`
+* `notes`: Release notes as Textile or Markdown
+* `notesType`: `0` Textile, `1` Markdown
+* `notify`: `0` not notify testers, `1` notify all testers that can install this app
 * `outputDirectory`: Only needed for iOS: `file("directory")`
-* `teams`: Optional: restrict download to comma-separated list of team IDs; example teams 123, 213 with 123,213 being database ids of your teams
+* `releaseType`: `0` beta, `1` live, `2` alpha
+* `repositoryUrl`: Optional: your source repository URL
+* `status`: `1` not allow users to download the version, `2` make the version available for download
+* `symbolsDirectory`: Only needed for iOS or if you don't use the android gradle plugin: `file("directory")` Directory which contains the `R` or `dSYM` file
 * `tags`: Optional: restrict download to comma-separated list of tags
+* `teamCityLog`: `true` Add features for [TeamCity](http://www.jetbrains.com/teamcity/)
+* `teams`: Optional: restrict download to comma-separated list of team IDs; example teams 123, 213 with 123,213 being database ids of your teams
 * `users`: Optional: restrict download to comma-separated list of user IDs; example:
 					users=1224,5678 with 1224 and 5678 being the database IDs of your users
-* `commitSha`: Optional: commit SHA for this build
-* `buildServerUrl`: Optional: the URL of the build job on your build server
-* `repositoryUrl`: Optional: your source repository URL
-* `teamCityLog`: `true` Add features for [TeamCity](http://www.jetbrains.com/teamcity/)
-
+* `variantToApiToken`: Optional: `[variantName: "YOURHOCKEYAPITOKEN", variantName2: "YOUROTHERHOCKEYAPITOKEN"]` map between your variants and api tokens
+* `variantToApplicationId`:  Optional (Android): `[variantName: "hockeyAppAppId", variantName2: "hockeyAppAppId2"]` map between your variants and HockeyApp application IDs
+* `variantToMandatory`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and mandatory
+* `variantToNotes` : Optional: `[variantName: "some notes", variantName2: "some other Notes"]` map between your variants and notes
+* `variantToNotesType` : Optional: `[variantName: "0", variantName2: "1"]` map between your variants and notesType
+* `variantToReleaseType`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and releaseType
+* `variantToStatus`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and status
 
 ## Migration from 2.x to >= 3.0
 
