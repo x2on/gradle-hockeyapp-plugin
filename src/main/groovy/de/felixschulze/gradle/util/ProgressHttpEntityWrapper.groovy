@@ -27,10 +27,6 @@ package de.felixschulze.gradle.util;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.HttpEntityWrapper;
 
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
 /**
  * HttpEntityWrapper with a progress callback
  *

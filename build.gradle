@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.github.townsfolk:gradle-release:1.2'
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.6'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.11.3'
     }
 }
 
@@ -34,11 +34,10 @@ dependencies {
     compile localGroovy()
     compile gradleApi()
     compile 'commons-io:commons-io:2.4'
-    compile 'commons-configuration:commons-configuration:1.8'
     compile 'org.apache.httpcomponents:httpclient:4.3.6'
     compile 'org.apache.httpcomponents:httpmime:4.3.6'
-    compile 'com.android.tools.build:gradle:1.0.0'
-    compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.0.2'
+    compile 'com.android.tools.build:gradle:1.5.0'
+    compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.2'
 }
 
 test {
