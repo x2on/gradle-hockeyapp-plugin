@@ -4,3 +4,4 @@
 .gradle
 example/target
 build
+.idea/
