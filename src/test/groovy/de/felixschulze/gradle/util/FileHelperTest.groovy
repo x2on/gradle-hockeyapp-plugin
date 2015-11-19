@@ -7,6 +7,7 @@ class FileHelperTest extends GroovyTestCase {
     void testNullChecks() {
         assertNull(FileHelper.getFile(null, null))
         assertNull(FileHelper.getFile("*", null))
+        assertNull(FileHelper.getFile(null, new File(".")))
     }
 
     void testNotExistingDirectory() {
@@ -27,5 +28,11 @@ class FileHelperTest extends GroovyTestCase {
 
     void testCorrectRegexButNoFilePresent() {
         assertNull(FileHelper.getFile(".*.xyzxyz", new File(".")))
+    }
+
+    void testNotADirectory() {
+        shouldFail(IllegalArgumentException) {
+            FileHelper.getFile(".*", new File("build.gradle"))
+        }
     }
 }
