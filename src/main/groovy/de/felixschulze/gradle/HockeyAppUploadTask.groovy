@@ -54,7 +54,7 @@ import org.gradle.internal.logging.progress.ProgressLoggerFactory
  */
 class HockeyAppUploadTask extends DefaultTask {
 
-    File applicationFile
+    List<File> applicationFiles = []
     File symbolsDirectory
     File mappingFile
     String variantName
@@ -75,14 +75,17 @@ class HockeyAppUploadTask extends DefaultTask {
 
         hockeyApp = project.hockeyapp
 
-        // Get the first output apk file if android
+        // Get all output apk files if android
         if (applicationVariant) {
             logger.debug('Using android application variants')
 
             applicationVariant.outputs.each {
                 if (FilenameUtils.isExtension(it.outputFile.getName(), "apk")) {
-                    applicationFile = it.outputFile
-                    return true
+                    if (it.outputFile.exists()) {
+                        applicationFiles << it.outputFile
+                    } else {
+                        logger.debug("App file doesn't exist: $it.outputFile.absolutePath")
+                    }
                 }
             }
 
@@ -102,23 +105,26 @@ class HockeyAppUploadTask extends DefaultTask {
             throw new IllegalArgumentException("Cannot upload to HockeyApp because API Token is missing")
         }
 
-        if (!applicationFile?.exists()) {
-            if (applicationFile) {
-                logger.debug("App file doesn't exist: "+applicationFile?.absolutePath)
-            }
+        if (!applicationFiles) {
             if (!applicationVariant && !hockeyApp.appFileNameRegex) {
                 throw new IllegalArgumentException("No appFileNameRegex provided.")
             }
             if (!hockeyApp.outputDirectory || !hockeyApp.outputDirectory.exists()) {
                 throw new IllegalArgumentException("The outputDirectory (" + hockeyApp.outputDirectory ? hockeyApp.outputDirectory.absolutePath : " not defined " + ") doesn't exists")
             }
-            applicationFile = FileHelper.getFile(hockeyApp.appFileNameRegex, hockeyApp.outputDirectory);
-            if (!applicationFile) {
+            applicationFiles = FileHelper.getFiles(hockeyApp.appFileNameRegex, hockeyApp.outputDirectory);
+            if (!applicationFiles) {
                 throw new IllegalStateException("No app file found in directory " + hockeyApp.outputDirectory.absolutePath)
             }
         }
 
-        logger.lifecycle("App file: " + applicationFile.absolutePath)
+        def appFilePaths = applicationFiles.collect { it.name }
+
+        if (!hockeyApp.allowMultipleAppFiles && applicationFiles.size() > 1) {
+            throw new IllegalStateException("Upload multiple files is not allowed: $appFilePaths")
+        }
+
+        logger.lifecycle("App files: $appFilePaths")
 
         // Retrieve mapping file if not using Android Gradle Plugin
         // Requires it to be set in the project config
@@ -147,7 +153,9 @@ class HockeyAppUploadTask extends DefaultTask {
             }
         }
 
-        uploadFilesToHockeyApp(applicationFile, mappingFile, appId)
+        applicationFiles.each {
+            uploadFilesToHockeyApp(it, mappingFile, appId)
+        }
 
     }
 

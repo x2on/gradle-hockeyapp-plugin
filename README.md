@@ -56,6 +56,7 @@ hockeyapp {
 
 ### Optional
 
+* `allowMultipleAppFiles`: `true` allow upload multiple app files (for example when using APK splits for Android)
 * `buildServerUrl`: Optional: the URL of the build job on your build server
 * `commitSha`: Optional: commit SHA for this build
 * `mandatory`: `0` not mandatory, `1` mandatory

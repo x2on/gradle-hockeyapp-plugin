@@ -32,8 +32,17 @@ class FileHelper {
 
     @Nullable
     def static getFile(String regex, File directory) {
-        if (!regex || !directory || !directory.exists()) {
+        def files = getFiles(regex, directory)
+        if (files) {
+            return files[0]
+        } else {
             return null
+        }
+    }
+
+    def static getFiles(String regex, File directory) {
+        if (!regex || !directory || !directory.exists()) {
+            return []
         }
 
         if (!directory.isDirectory()) {
@@ -47,8 +56,10 @@ class FileHelper {
         ).toList()
 
         if (!fileList) {
-            return null
+            return []
         }
-        return new File(directory, fileList[0])
+        return fileList.collect {
+            new File(directory, it)
+        }
     }
 }
