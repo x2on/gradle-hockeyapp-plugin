@@ -36,6 +36,10 @@ class FileHelper {
             return null
         }
 
+        if (!directory.isDirectory()) {
+            throw new IllegalArgumentException("$directory.absolutePath is not a directory")
+        }
+
         def pattern = Pattern.compile(regex)
 
         def fileList = directory.list(
