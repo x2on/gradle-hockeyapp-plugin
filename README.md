@@ -86,7 +86,7 @@ hockeyapp {
 * `appFileNameRegex`: Only needed for iOS or if you don't use the android gradle plugin `appFileNameRegex = ".*.ipa"
 * `outputDirectory`: Only needed for iOS: `file("directory")`
 * `symbolsDirectory`: Only needed for iOS or if you don't use the android gradle plugin: `file("directory")` Directory which contains the `R` or `dSYM` file
-* 
+
 ## Migration from 2.x to >= 3.0
 
 To migrate to version >= 3.0 please change 
