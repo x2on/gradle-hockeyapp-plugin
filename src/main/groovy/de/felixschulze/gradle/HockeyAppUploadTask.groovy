@@ -333,8 +333,14 @@ class HockeyAppUploadTask extends DefaultTask {
         if (hockeyApp.repositoryUrl) {
             entityBuilder.addPart("repository_url", new StringBody(hockeyApp.repositoryUrl))
         }
-        if (hockeyApp.tags) {
-            entityBuilder.addPart("tags", new StringBody(hockeyApp.tags))
+        String tags = hockeyApp.tags
+        if (hockeyApp.variantToTags) {
+            if (hockeyApp.variantToTags[variantName]) {
+                tags = hockeyApp.variantToTags[variantName]
+            }
+        }
+        if (tags) {
+            entityBuilder.addPart("tags", new StringBody(tags))
         }
         if (hockeyApp.teams) {
             entityBuilder.addPart("teams", new StringBody(hockeyApp.teams))
