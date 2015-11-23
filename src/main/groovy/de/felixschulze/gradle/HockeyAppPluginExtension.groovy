@@ -38,6 +38,7 @@ class HockeyAppPluginExtension {
     def Map<String, String> variantToNotes = null
     def String status = 2
     def String notify = 0
+    def Map<String, String> variantToNotify = null
     def String notesType = 1
     def Map<String, String> variantToNotesType = null
     def String releaseType = 0

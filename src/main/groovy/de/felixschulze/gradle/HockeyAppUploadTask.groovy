@@ -285,42 +285,23 @@ class HockeyAppUploadTask extends DefaultTask {
     }
 
     private void decorateWithOptionalProperties(MultipartEntityBuilder entityBuilder) {
-        if (hockeyApp.notify) {
-            entityBuilder.addPart("notify", new StringBody(hockeyApp.notify as String))
+        String notify = optionalProperty(hockeyApp.notify as String, hockeyApp.variantToNotify)
+        if (notify) {
+            entityBuilder.addPart("notify", new StringBody(notify as String))
         }
-        String notesType = hockeyApp.notesType
-        if(hockeyApp.variantToNotesType){
-        	if(hockeyApp.variantToNotesType[variantName]){
-        		notesType = hockeyApp.variantToNotesType[variantName]
-        	}
-        }
+        String notesType = optionalProperty(hockeyApp.notesType as String, hockeyApp.variantToNotesType)
         if (notesType) {
             entityBuilder.addPart("notes_type", new StringBody(notesType))
         }
-        String notes = hockeyApp.notes
-        if(hockeyApp.variantToNotes){
-        	if(hockeyApp.variantToNotes[variantName]){
-        		notes = hockeyApp.variantToNotes[variantName]
-        	}
-        }
+        String notes = optionalProperty(hockeyApp.notes, hockeyApp.variantToNotes)
         if (notes) {
             entityBuilder.addPart("notes", new StringBody(notes, Consts.UTF_8))
         }
-        String status = hockeyApp.status
-        if (hockeyApp.variantToStatus) {
-            if (hockeyApp.variantToStatus[variantName]){
-              status = hockeyApp.variantToStatus[variantName]
-            }
-        }
+        String status = optionalProperty(hockeyApp.status as String, hockeyApp.variantToStatus)
         if (status) {
             entityBuilder.addPart("status", new StringBody(status))
         }
-        String releaseType = hockeyApp.releaseType
-        if (hockeyApp.variantToReleaseType) {
-            if (hockeyApp.variantToReleaseType[variantName]) {
-                releaseType = hockeyApp.variantToReleaseType[variantName]
-            }
-        }
+        String releaseType = optionalProperty(hockeyApp.releaseType as String, hockeyApp.variantToReleaseType)
         if (releaseType) {
             entityBuilder.addPart("release_type", new StringBody(releaseType as String))
         }
@@ -333,12 +314,7 @@ class HockeyAppUploadTask extends DefaultTask {
         if (hockeyApp.repositoryUrl) {
             entityBuilder.addPart("repository_url", new StringBody(hockeyApp.repositoryUrl))
         }
-        String tags = hockeyApp.tags
-        if (hockeyApp.variantToTags) {
-            if (hockeyApp.variantToTags[variantName]) {
-                tags = hockeyApp.variantToTags[variantName]
-            }
-        }
+        String tags = optionalProperty(hockeyApp.tags as String, hockeyApp.variantToTags)
         if (tags) {
             entityBuilder.addPart("tags", new StringBody(tags))
         }
@@ -348,15 +324,19 @@ class HockeyAppUploadTask extends DefaultTask {
         if (hockeyApp.users) {
             entityBuilder.addPart("users", new StringBody(hockeyApp.users))
         }
-        String mandatory = hockeyApp.mandatory
-        if (hockeyApp.variantToMandatory){
-            if (hockeyApp.variantToMandatory[variantName]){
-              mandatory = hockeyApp.variantToMandatory[variantName]
-            }
-        }
+        String mandatory = optionalProperty(hockeyApp.mandatory as String, hockeyApp.variantToMandatory)
         if (mandatory){
             entityBuilder.addPart("mandatory", new StringBody(mandatory))
         }
+    }
+
+    private String optionalProperty(String property, Map<String, String> variantToProperty) {
+        if(variantToProperty) {
+            if(variantToProperty[variantName]) {
+                property = variantToProperty[variantName]
+            }
+        }
+        return property
     }
 
     private String getApiToken() {

@@ -69,6 +69,8 @@ hockeyapp {
 * `variantToReleaseType`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and releaseType
 * `variantToStatus`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and status
 * `variantToTags`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and tags
+* `variantToNotify`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and notify
+
 
 ### iOS or custom Android build only options
 * `appFileNameRegex`: Only needed for iOS or if you don't use the android gradle plugin `appFileNameRegex = ".*.ipa"
