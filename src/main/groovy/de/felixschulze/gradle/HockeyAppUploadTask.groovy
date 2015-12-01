@@ -86,11 +86,11 @@ class HockeyAppUploadTask extends DefaultTask {
                 }
             }
 
-            if (applicationVariant.getObfuscation()) {
-                logger.debug('Obfuscation is used')
+            if (applicationVariant.getMappingFile()?.exists()) {
+                logger.debug('Mapping file found')
                 mappingFile = applicationVariant.getMappingFile()
             } else {
-                logger.debug('Obfuscation is not used')
+                logger.debug('Mapping file not found')
                 mappingFileCouldBePresent = false
             }
         }
