@@ -33,7 +33,7 @@ hockeyapp {
     notify = 0
     status = 2
     notesType = 1
-    notes = "Some notes."
+    notes = new File(file('../README.md').absolutePath).getText('UTF-8')
     variantToApplicationId = [
             BuildVariantA:  "hockeyAppapplicationIdA",
             BuildVariantB:  "hockeyAppapplicationIdB",
