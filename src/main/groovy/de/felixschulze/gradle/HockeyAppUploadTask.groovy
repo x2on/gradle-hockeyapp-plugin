@@ -302,7 +302,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
         logger.debug("Response status code: " + response.getStatusLine().getStatusCode())
 
-        if (response.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
+        if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
             parseResponseAndThrowError(response)
         } else {
             logger.lifecycle("Successfully purged older versions.")
