@@ -22,10 +22,10 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze.gradle.util;
+package de.felixschulze.gradle.util
 
-import org.apache.http.HttpEntity;
-import org.apache.http.entity.HttpEntityWrapper;
+import org.apache.http.HttpEntity
+import org.apache.http.entity.HttpEntityWrapper
 
 /**
  * HttpEntityWrapper with a progress callback

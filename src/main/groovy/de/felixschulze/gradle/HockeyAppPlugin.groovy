@@ -24,12 +24,12 @@
 
 package de.felixschulze.gradle
 
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.api.ApplicationVariant
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.AppPlugin
 
 /**
  * Main gradle-hockeyapp-plugin class

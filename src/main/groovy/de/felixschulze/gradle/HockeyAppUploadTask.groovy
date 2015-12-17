@@ -93,8 +93,7 @@ class HockeyAppUploadTask extends DefaultTask {
                 logger.debug('Mapping file not found')
                 mappingFileCouldBePresent = false
             }
-        }
-        else {
+        } else {
             logger.debug('Not using android application variants')
         }
 
@@ -104,7 +103,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
         if (!applicationFile?.exists()) {
             if (applicationFile) {
-                logger.debug("App file doesn't exist: "+applicationFile?.absolutePath)
+                logger.debug("App file doesn't exist: " + applicationFile?.absolutePath)
             }
             if (!applicationVariant && !hockeyApp.appFileNameRegex) {
                 throw new IllegalArgumentException("No appFileNameRegex provided.")
@@ -139,7 +138,7 @@ class HockeyAppUploadTask extends DefaultTask {
         if (hockeyApp.variantToApplicationId) {
             appId = hockeyApp.variantToApplicationId[variantName]
             if (!appId) {
-                if(project.getGradle().getTaskGraph().hasTask(uploadAllPath)) {
+                if (project.getGradle().getTaskGraph().hasTask(uploadAllPath)) {
                     logger.error("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
                 } else {
                     throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
@@ -201,7 +200,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
             @Override
             public void progress(float progress) {
-                int progressInt = (int)progress
+                int progressInt = (int) progress
                 if (progressInt > lastProgress) {
                     lastProgress = progressInt
                     if (progressInt % 5 == 0) {
@@ -226,8 +225,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
         if (response.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
             parseResponseAndThrowError(response)
-        }
-        else {
+        } else {
             logger.lifecycle("Application uploaded successfully.")
             if (response.getEntity() && response.getEntity().getContentLength() > 0) {
                 InputStreamReader reader = new InputStreamReader(response.getEntity().content)
@@ -325,14 +323,32 @@ class HockeyAppUploadTask extends DefaultTask {
             entityBuilder.addPart("users", new StringBody(hockeyApp.users))
         }
         String mandatory = optionalProperty(hockeyApp.mandatory as String, hockeyApp.variantToMandatory)
-        if (mandatory){
+        if (mandatory) {
             entityBuilder.addPart("mandatory", new StringBody(mandatory))
+        }
+
+        // http://support.hockeyapp.net/kb/api/api-versions#delete-multiple-versions
+        String strategy = optionalProperty(hockeyApp.strategy as String, hockeyApp.variantToStrategy)
+        if (strategy) {
+            entityBuilder.addPart("strategy", new StringBody(strategy, Consts.UTF_8))
+        }
+        String sort = optionalProperty(hockeyApp.sort as String, hockeyApp.variantToSort)
+        if (sort) {
+            entityBuilder.addPart("sort", new StringBody(sort, Consts.UTF_8))
+        }
+        String number = optionalProperty(hockeyApp.number as String, hockeyApp.variantToNumber)
+        if (number) {
+            entityBuilder.addPart("number", new StringBody(number, Consts.UTF_8))
+        }
+        String keep = optionalProperty(hockeyApp.keep as String, hockeyApp.variantToKeep)
+        if (keep) {
+            entityBuilder.addPart("keep", new StringBody(keep, Consts.UTF_8))
         }
     }
 
     private String optionalProperty(String property, Map<String, String> variantToProperty) {
-        if(variantToProperty) {
-            if(variantToProperty[variantName]) {
+        if (variantToProperty) {
+            if (variantToProperty[variantName]) {
                 property = variantToProperty[variantName]
             }
         }
