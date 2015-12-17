@@ -192,7 +192,6 @@ class HockeyAppUploadTask extends DefaultTask {
 
         httpPost.addHeader("X-HockeyAppToken", getApiToken())
 
-
         int lastProgress = 0
         Logger loggerForCallback = logger
         Boolean teamCityLog = hockeyApp.teamCityLog
@@ -226,6 +225,7 @@ class HockeyAppUploadTask extends DefaultTask {
         if (response.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
             parseResponseAndThrowError(response)
         } else {
+            purgeVersions(appId);
             logger.lifecycle("Application uploaded successfully.")
             if (response.getEntity() && response.getEntity().getContentLength() > 0) {
                 InputStreamReader reader = new InputStreamReader(response.getEntity().content)
@@ -247,6 +247,68 @@ class HockeyAppUploadTask extends DefaultTask {
             }
             progressLogger.completed()
         }
+    }
+
+    private void purgeVersions(@Nullable String appId) {
+
+        ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation(this.getClass())
+        progressLogger.start("Purge older versions.", "Upload file")
+
+        RequestConfig.Builder requestBuilder = RequestConfig.custom()
+        requestBuilder = requestBuilder.setConnectTimeout(hockeyApp.timeout)
+        requestBuilder = requestBuilder.setConnectionRequestTimeout(hockeyApp.timeout)
+
+        String proxyHost = System.getProperty("http.proxyHost", "")
+        int proxyPort = System.getProperty("http.proxyPort", "0") as int
+        if (proxyHost.length() > 0 && proxyPort > 0) {
+            logger.lifecycle("Using proxy: " + proxyHost + ":" + proxyPort)
+            HttpHost proxy = new HttpHost(proxyHost, proxyPort);
+            requestBuilder = requestBuilder.setProxy(proxy)
+        }
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        builder.setDefaultRequestConfig(requestBuilder.build());
+        HttpClient httpClient = builder.build();
+
+        String uploadUrl = hockeyApp.hockeyApiUrl
+        if (appId) {
+            uploadUrl = "${hockeyApp.hockeyApiUrl}/${appId}/app_versions/delete"
+        }
+        HttpPost httpPost = new HttpPost(uploadUrl)
+        httpPost.addHeader("X-HockeyAppToken", getApiToken())
+
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create()
+        decorateWithOptionalDeleteProperties(entityBuilder)
+
+        int lastProgress = 0
+        Logger loggerForCallback = logger
+        ProgressHttpEntityWrapper.ProgressCallback progressCallback = new ProgressHttpEntityWrapper.ProgressCallback() {
+
+            @Override
+            public void progress(float progress) {
+                int progressInt = (int) progress
+                if (progressInt > lastProgress) {
+                    lastProgress = progressInt
+                    if (progressInt % 5 == 0) {
+                        progressLogger.progress(progressInt + "% purged.")
+                        loggerForCallback.info(progressInt + "% purged")
+                    }
+                }
+            }
+        }
+
+        httpPost.setEntity(new ProgressHttpEntityWrapper(entityBuilder.build(), progressCallback));
+
+        HttpResponse response = httpClient.execute(httpPost)
+
+        logger.debug("Response status code: " + response.getStatusLine().getStatusCode())
+
+        if (response.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
+            parseResponseAndThrowError(response)
+        } else {
+            logger.lifecycle("Successfully purged older versions.")
+        }
+
+        progressLogger.completed()
     }
 
     private void parseResponseAndThrowError(HttpResponse response) {
@@ -280,6 +342,29 @@ class HockeyAppUploadTask extends DefaultTask {
             }
         }
         throw new IllegalStateException("File upload failed: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
+    }
+
+    /**
+     * http://support.hockeyapp.net/kb/api/api-versions#delete-multiple-versions
+     */
+    private void decorateWithOptionalDeleteProperties(MultipartEntityBuilder entityBuilder) {
+
+        String strategy = optionalProperty(hockeyApp.strategy as String, hockeyApp.variantToStrategy)
+        if (strategy) {
+            entityBuilder.addPart("strategy", new StringBody(strategy, Consts.UTF_8))
+        }
+        String sort = optionalProperty(hockeyApp.sort as String, hockeyApp.variantToSort)
+        if (sort) {
+            entityBuilder.addPart("sort", new StringBody(sort, Consts.UTF_8))
+        }
+        String number = optionalProperty(hockeyApp.number as String, hockeyApp.variantToNumber)
+        if (number) {
+            entityBuilder.addPart("number", new StringBody(number, Consts.UTF_8))
+        }
+        String keep = optionalProperty(hockeyApp.keep as String, hockeyApp.variantToKeep)
+        if (keep) {
+            entityBuilder.addPart("keep", new StringBody(keep, Consts.UTF_8))
+        }
     }
 
     private void decorateWithOptionalProperties(MultipartEntityBuilder entityBuilder) {
@@ -325,24 +410,6 @@ class HockeyAppUploadTask extends DefaultTask {
         String mandatory = optionalProperty(hockeyApp.mandatory as String, hockeyApp.variantToMandatory)
         if (mandatory) {
             entityBuilder.addPart("mandatory", new StringBody(mandatory))
-        }
-
-        // http://support.hockeyapp.net/kb/api/api-versions#delete-multiple-versions
-        String strategy = optionalProperty(hockeyApp.strategy as String, hockeyApp.variantToStrategy)
-        if (strategy) {
-            entityBuilder.addPart("strategy", new StringBody(strategy, Consts.UTF_8))
-        }
-        String sort = optionalProperty(hockeyApp.sort as String, hockeyApp.variantToSort)
-        if (sort) {
-            entityBuilder.addPart("sort", new StringBody(sort, Consts.UTF_8))
-        }
-        String number = optionalProperty(hockeyApp.number as String, hockeyApp.variantToNumber)
-        if (number) {
-            entityBuilder.addPart("number", new StringBody(number, Consts.UTF_8))
-        }
-        String keep = optionalProperty(hockeyApp.keep as String, hockeyApp.variantToKeep)
-        if (keep) {
-            entityBuilder.addPart("keep", new StringBody(keep, Consts.UTF_8))
         }
     }
 
