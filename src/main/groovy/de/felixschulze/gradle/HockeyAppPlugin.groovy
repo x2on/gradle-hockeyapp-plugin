@@ -24,12 +24,13 @@
 
 package de.felixschulze.gradle
 
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.api.ApplicationVariant
+import com.android.build.gradle.internal.dsl.BuildType
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.AppPlugin
 
 /**
  * Main gradle-hockeyapp-plugin class
@@ -51,11 +52,27 @@ class HockeyAppPlugin implements Plugin<Project> {
 
         if (project.plugins.hasPlugin(AppPlugin)) {
             AppExtension android = project.android
+
             Task uploadAllTask = project.tasks.create("uploadToHockeyApp", Task);
             uploadAllTask.group = GROUP_NAME
             uploadAllTask.description = "Uploads all variants to HockeyApp"
             uploadAllTask.outputs.upToDateWhen { false }
             String uploadAllPath = uploadAllTask.getPath();
+
+            ArrayList<BuildTypeTask> buildTypeTasks = new ArrayList<>();
+
+            for (BuildType buildType : android.buildTypes) {
+
+                BuildTypeTask buildTypeTask = project.tasks.create("upload${buildType.name.capitalize()}ToHockeyApp", BuildTypeTask);
+
+                buildTypeTask.buildType = buildType;
+                buildTypeTask.group = GROUP_NAME
+                buildTypeTask.description = "Uploads all variants of build Type '${buildType.name}' to HockeyApp"
+                buildTypeTask.outputs.upToDateWhen { false }
+
+                buildTypeTasks.add(buildTypeTask);
+            }
+
 
             android.applicationVariants.all { ApplicationVariant variant ->
                 HockeyAppUploadTask task = project.tasks.create("upload${variant.name.capitalize()}ToHockeyApp", HockeyAppUploadTask)
@@ -68,6 +85,13 @@ class HockeyAppPlugin implements Plugin<Project> {
                 task.uploadAllPath = uploadAllPath
 
                 uploadAllTask.dependsOn(task)
+
+                for (BuildTypeTask buildTypeTask : buildTypeTasks) {
+                    if (variant.buildType.equals(buildTypeTask.buildType)) {
+                        buildTypeTask.dependsOn(task)
+                        break
+                    }
+                }
             }
         } else {
             project.task('uploadToHockeyApp', type: HockeyAppUploadTask, group: GROUP_NAME)
