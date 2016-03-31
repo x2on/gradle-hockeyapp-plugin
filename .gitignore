@@ -5,3 +5,5 @@
 example/target
 build
 .idea
+.DS_Store
+gradle-hockeyapp-plugin_main.jar
