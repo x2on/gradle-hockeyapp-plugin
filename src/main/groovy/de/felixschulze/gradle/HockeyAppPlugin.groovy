@@ -27,7 +27,6 @@ package de.felixschulze.gradle
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.api.ApplicationVariant
-import com.android.build.gradle.internal.dsl.BuildType
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -59,20 +58,7 @@ class HockeyAppPlugin implements Plugin<Project> {
             uploadAllTask.outputs.upToDateWhen { false }
             String uploadAllPath = uploadAllTask.getPath();
 
-            ArrayList<BuildTypeTask> buildTypeTasks = new ArrayList<>();
-
-            for (BuildType buildType : android.buildTypes) {
-
-                BuildTypeTask buildTypeTask = project.tasks.create("upload${buildType.name.capitalize()}ToHockeyApp", BuildTypeTask);
-
-                buildTypeTask.buildType = buildType;
-                buildTypeTask.group = GROUP_NAME
-                buildTypeTask.description = "Uploads all variants of build Type '${buildType.name}' to HockeyApp"
-                buildTypeTask.outputs.upToDateWhen { false }
-
-                buildTypeTasks.add(buildTypeTask);
-            }
-
+            HashMap<String, BuildTypeTask> buildTypeTasks = new HashMap<>();
 
             android.applicationVariants.all { ApplicationVariant variant ->
                 HockeyAppUploadTask task = project.tasks.create("upload${variant.name.capitalize()}ToHockeyApp", HockeyAppUploadTask)
@@ -86,11 +72,13 @@ class HockeyAppPlugin implements Plugin<Project> {
 
                 uploadAllTask.dependsOn(task)
 
-                for (BuildTypeTask buildTypeTask : buildTypeTasks) {
-                    if (variant.buildType.equals(buildTypeTask.buildType)) {
-                        buildTypeTask.dependsOn(task)
-                        break
-                    }
+                BuildTypeTask buildTypeTask = buildTypeTasks.get(variant.buildType.name);
+
+                if (buildTypeTask == null) {
+                    buildTypeTask = BuildTypeTask.createBuildTypeTask(project, variant.buildType, task);
+                    buildTypeTasks.put(variant.buildType.name, buildTypeTask);
+                } else {
+                    buildTypeTask.dependsOn(task);
                 }
             }
         } else {
