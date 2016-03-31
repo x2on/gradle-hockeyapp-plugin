@@ -18,8 +18,13 @@ class BuildTypeTask extends DefaultTask {
         buildTypeTask.description = "Uploads all variants of build Type '${buildType.name}' to HockeyApp"
         buildTypeTask.outputs.upToDateWhen { false }
 
-        buildTypeTask.dependsOn(hockeyAppUploadTask)
+        buildTypeTask.addDependency(hockeyAppUploadTask)
 
         return buildTypeTask;
+    }
+
+    void addDependency(HockeyAppUploadTask hockeyAppUploadTask) {
+        hockeyAppUploadTask.uploadBuildTypePath = this.getPath();
+        this.dependsOn(hockeyAppUploadTask);
     }
 }

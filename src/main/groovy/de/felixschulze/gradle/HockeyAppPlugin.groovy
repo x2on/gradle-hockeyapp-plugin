@@ -78,7 +78,7 @@ class HockeyAppPlugin implements Plugin<Project> {
                     buildTypeTask = BuildTypeTask.createBuildTypeTask(project, variant.buildType, task);
                     buildTypeTasks.put(variant.buildType.name, buildTypeTask);
                 } else {
-                    buildTypeTask.dependsOn(task);
+                    buildTypeTask.addDependency(task);
                 }
             }
         } else {
