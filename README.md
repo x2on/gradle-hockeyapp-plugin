@@ -22,6 +22,12 @@ hockeyapp {
 }
 ```
 
+### Upload task
+The task name is generated based on your productFlavors and buildTypes. For a basic release build with no flavors using the gradle wrapper:
+```gradle
+./gradlew uploadReleaseToHockeyApp
+```
+
 ## Advanced usage
 
 Add to your build.gradle
