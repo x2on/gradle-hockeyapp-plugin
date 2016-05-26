@@ -242,6 +242,7 @@ class HockeyAppUploadTask extends DefaultTask {
                 if (uploadResponse) {
                     logger.info("Upload information: Title: '" + uploadResponse.title?.toString() + "' Config url: '" + uploadResponse.config_url?.toString()) + "'";
                     logger.debug("Upload response: " + uploadResponse.toString())
+                    logger.lifecycle("Application public url " + uploadResponse.public_url?.toString())
                 }
             }
             if (hockeyApp.teamCityLog) {
