@@ -2,6 +2,10 @@
 
 A Gradle plugin for uploading iOS and Android Apps to HockeyApp.
 
+## Compatibility
+
+The plugin is compatible with gradle 2.14 only.
+
 ## Basic usage
 
 Add to your build.gradle
