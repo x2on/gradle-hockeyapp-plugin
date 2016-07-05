@@ -46,8 +46,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Nullable
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.TaskAction
-import org.gradle.logging.ProgressLogger
-import org.gradle.logging.ProgressLoggerFactory
+import org.gradle.internal.logging.progress.ProgressLogger
+import org.gradle.internal.logging.progress.ProgressLoggerFactory
 
 /**
  * Upload task for plugin
@@ -153,7 +153,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
     def void uploadFilesToHockeyApp(File appFile, @Nullable File mappingFile, @Nullable String appId) {
 
-        ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation(this.getClass())
+        ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation( this.getClass())
         progressLogger.start("Upload file to Hockey App", "Upload file")
         if (hockeyApp.teamCityLog) {
             println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.START, "Upload file to Hockey App")
