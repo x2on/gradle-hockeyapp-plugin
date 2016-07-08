@@ -24,12 +24,12 @@
 
 package de.felixschulze.gradle
 
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.api.ApplicationVariant
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.AppPlugin
 
 /**
  * Main gradle-hockeyapp-plugin class
@@ -51,11 +51,14 @@ class HockeyAppPlugin implements Plugin<Project> {
 
         if (project.plugins.hasPlugin(AppPlugin)) {
             AppExtension android = project.android
+
             Task uploadAllTask = project.tasks.create("uploadToHockeyApp", Task);
             uploadAllTask.group = GROUP_NAME
             uploadAllTask.description = "Uploads all variants to HockeyApp"
             uploadAllTask.outputs.upToDateWhen { false }
             String uploadAllPath = uploadAllTask.getPath();
+
+            HashMap<String, BuildTypeTask> buildTypeTasks = new HashMap<>();
 
             android.applicationVariants.all { ApplicationVariant variant ->
                 HockeyAppUploadTask task = project.tasks.create("upload${variant.name.capitalize()}ToHockeyApp", HockeyAppUploadTask)
@@ -68,6 +71,15 @@ class HockeyAppPlugin implements Plugin<Project> {
                 task.uploadAllPath = uploadAllPath
 
                 uploadAllTask.dependsOn(task)
+
+                BuildTypeTask buildTypeTask = buildTypeTasks.get(variant.buildType.name);
+
+                if (buildTypeTask == null) {
+                    buildTypeTask = BuildTypeTask.createBuildTypeTask(project, variant.buildType, task);
+                    buildTypeTasks.put(variant.buildType.name, buildTypeTask);
+                } else {
+                    buildTypeTask.addDependency(task);
+                }
             }
         } else {
             project.task('uploadToHockeyApp', type: HockeyAppUploadTask, group: GROUP_NAME)
