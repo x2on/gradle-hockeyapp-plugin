@@ -46,8 +46,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Nullable
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.TaskAction
-import org.gradle.logging.ProgressLogger
-import org.gradle.logging.ProgressLoggerFactory
+import org.gradle.internal.logging.progress.ProgressLogger
 
 /**
  * Upload task for plugin
