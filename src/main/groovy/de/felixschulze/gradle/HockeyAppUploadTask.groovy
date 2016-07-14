@@ -47,6 +47,7 @@ import org.gradle.api.Nullable
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.logging.progress.ProgressLogger
+import org.gradle.internal.logging.progress.ProgressLoggerFactory
 
 /**
  * Upload task for plugin
@@ -149,9 +150,10 @@ class HockeyAppUploadTask extends DefaultTask {
 
     }
 
-    def void uploadFilesToHockeyApp(File appFile, @Nullable File mappingFile, @Nullable String appId) {
+    def void uploadFilesToHockeyApp(File appFile,
+                                    @Nullable File mappingFile, @Nullable String appId) {
 
-        ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation(this.getClass())
+        final ProgressLogger progressLogger = getProgressLogger()
         progressLogger.start("Upload file to Hockey App", "Upload file")
         if (hockeyApp.teamCityLog) {
             println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.START, "Upload file to Hockey App")
@@ -250,7 +252,8 @@ class HockeyAppUploadTask extends DefaultTask {
 
     private void purgeVersions(@Nullable String appId) {
 
-        ProgressLogger progressLogger = services.get(ProgressLoggerFactory).newOperation(this.getClass())
+
+        final ProgressLogger progressLogger = getProgressLogger()
         progressLogger.start("Purge older versions.", "Upload file")
 
         RequestConfig.Builder requestBuilder = RequestConfig.custom()
@@ -308,6 +311,12 @@ class HockeyAppUploadTask extends DefaultTask {
         }
 
         progressLogger.completed()
+    }
+
+    private ProgressLogger getProgressLogger() {
+        ProgressLoggerFactory progressLoggerFactory = getServices().get(ProgressLoggerFactory.class);
+        ProgressLogger progressLogger = progressLoggerFactory.newOperation(this.getClass())
+        progressLogger
     }
 
     private void parseResponseAndThrowError(HttpResponse response) {
