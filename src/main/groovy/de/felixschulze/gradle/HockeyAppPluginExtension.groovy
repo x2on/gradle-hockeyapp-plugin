@@ -51,7 +51,7 @@ class HockeyAppPluginExtension {
     def String tags = null
     def Map<String, String> variantToTags = null
     def String teams = null
-	def String users = null
+    def String users = null
     def int timeout = 60 * 1000
     def Map<String, String> variantToApplicationId = null
     def Boolean teamCityLog = false
@@ -60,6 +60,14 @@ class HockeyAppPluginExtension {
     def Map<String, String> variantToMandatory = null
     def String hockeyApiUrl = "https://rink.hockeyapp.net/api/2/apps"
 
+    def String strategy = 0
+    def Map<String, String> variantToStrategy = null
+    def String sort = 0
+    def Map<String, String> variantToSort = null
+    def String number = 0
+    def Map<String, String> variantToNumber = null
+    def String keep = 0
+    def Map<String, String> variantToKeep = null
 
     private final Project project
 
@@ -77,6 +85,4 @@ class HockeyAppPluginExtension {
     void setOutputDirectory(Object outputDirectory) {
         this.outputDirectory = outputDirectory
     }
-
-
 }

@@ -65,8 +65,11 @@ hockeyapp {
 * `tags`: Optional: restrict download to comma-separated list of tags
 * `teamCityLog`: `true` Add features for [TeamCity](http://www.jetbrains.com/teamcity/)
 * `teams`: Optional: restrict download to comma-separated list of team IDs; example teams 123, 213 with 123,213 being database ids of your teams
-* `users`: Optional: restrict download to comma-separated list of user IDs; example:
-					users=1224,5678 with 1224 and 5678 being the database IDs of your users
+* `users`: Optional: restrict download to comma-separated list of user IDs; example: users=1224,5678 with 1224 and 5678 being the database IDs of your users
+* `strategy`: Optional: set to `purge` (default) or `soft`; `purge` completely removes the version, while `soft` keeps some data including stats and crashes
+* `sort`: Optional: set to `version` to sort by version number (default) or to `date` to sort by creation date
+* `number`: Optional: specifies the number of versions to be deleted (default: `0` = all)
+* `keep`: Optional: specifies the number of versions to be kept (default: `0` = none)
 * `variantToApiToken`: Optional: `[variantName: "YOURHOCKEYAPITOKEN", variantName2: "YOUROTHERHOCKEYAPITOKEN"]` map between your variants and api tokens
 * `variantToApplicationId`:  Optional (Android): `[variantName: "hockeyAppAppId", variantName2: "hockeyAppAppId2"]` map between your variants and HockeyApp application IDs
 * `variantToMandatory`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and mandatory
