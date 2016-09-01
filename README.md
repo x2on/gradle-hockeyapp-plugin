@@ -1,4 +1,4 @@
-# gradle-hockeyapp-plugin [![Build Status](https://travis-ci.org/x2on/gradle-hockeyapp-plugin.png)](https://travis-ci.org/x2on/gradle-hockeyapp-plugin) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.felixschulze.gradle/gradle-hockeyapp-plugin/badge.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22de.felixschulze.gradle%22%20AND%20a%3A%22gradle-hockeyapp-plugin%22) [![License MIT](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/x2on/gradle-hockeyapp-plugin/blob/master/LICENSE)
+# gradle-hockeyapp-plugin [![Build Status](https://travis-ci.org/x2on/gradle-hockeyapp-plugin.png)](https://travis-ci.org/x2on/gradle-hockeyapp-plugin) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.felixschulze.gradle/gradle-hockeyapp-plugin/badge.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22de.felixschulze.gradle%22%20AND%20a%3A%22gradle-hockeyapp-plugin%22) [![license](https://img.shields.io/github/license/x2on/gradle-hockeyapp-plugin.svg)](https://github.com/x2on/gradle-hockeyapp-plugin/blob/master/LICENSE)
 
 A Gradle plugin for uploading iOS and Android Apps to HockeyApp.
 
@@ -86,7 +86,7 @@ hockeyapp {
 * `appFileNameRegex`: Only needed for iOS or if you don't use the android gradle plugin `appFileNameRegex = ".*.ipa"
 * `outputDirectory`: Only needed for iOS: `file("directory")`
 * `symbolsDirectory`: Only needed for iOS or if you don't use the android gradle plugin: `file("directory")` Directory which contains the `R` or `dSYM` file
-* 
+
 ## Migration from 2.x to >= 3.0
 
 To migrate to version >= 3.0 please change 
