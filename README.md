@@ -26,6 +26,18 @@ hockeyapp {
 }
 ```
 
+As the upload tasks are automatically generated based on application variants, ensure this plugin is applied *after* the android plugin. i.e.
+
+```
+...
+
+apply plugin: 'com.android.application'
+apply plugin: 'de.felixschulze.gradle.hockeyapp'
+
+...
+
+```
+
 ### Upload task
 The task name is generated based on your productFlavors and buildTypes. For a basic release build with no flavors using the gradle wrapper:
 ```gradle
