@@ -1,41 +1,25 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
 buildscript {
     repositories {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.1'
-        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.1'
+        classpath 'com.android.tools.build:gradle:2.2.1'
+        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.6'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
-apply plugin: 'com.android.application'
-apply plugin: 'de.felixschulze.gradle.hockeyapp'
-
-android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
-
-    defaultConfig {
-        applicationId "felixschulze.de.hockeyappuploadexample"
-        minSdkVersion 15
-        targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+allprojects {
+    repositories {
+        jcenter()
     }
 }
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
-}
 
-hockeyapp {
-    apiToken = "123456789123456789"
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }
-
