@@ -302,6 +302,10 @@ class HockeyAppUploadTask extends DefaultTask {
         if (status) {
             entityBuilder.addPart("status", new StringBody(status))
         }
+        String strategy = optionalProperty(hockeyApp.strategy as String, hockeyApp.variantToStrategy)
+        if (strategy) {
+            entityBuilder.addPart("strategy", new StringBody(strategy))
+        }
         String releaseType = optionalProperty(hockeyApp.releaseType as String, hockeyApp.variantToReleaseType)
         if (releaseType) {
             entityBuilder.addPart("release_type", new StringBody(releaseType as String))
