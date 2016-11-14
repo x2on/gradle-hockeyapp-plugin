@@ -37,6 +37,7 @@ class HockeyAppPluginExtension {
     def String notes = "This build was uploaded using the gradle-hockeyapp-plugin"
     def Map<String, String> variantToNotes = null
     def String status = 2
+    def String strategy = "add"
     def String notify = 0
     def Map<String, String> variantToNotify = null
     def String notesType = 1
@@ -51,11 +52,12 @@ class HockeyAppPluginExtension {
     def String tags = null
     def Map<String, String> variantToTags = null
     def String teams = null
-	def String users = null
+	  def String users = null
     def int timeout = 60 * 1000
     def Map<String, String> variantToApplicationId = null
     def Boolean teamCityLog = false
     def Map<String, String> variantToStatus = null
+    def Map<String, String> variantToStrategy = null
     def String mandatory = 0
     def Map<String, String> variantToMandatory = null
     def String hockeyApiUrl = "https://rink.hockeyapp.net/api/2/apps"

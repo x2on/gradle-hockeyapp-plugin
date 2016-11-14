@@ -78,6 +78,7 @@ hockeyapp {
 * `releaseType`: `0` beta, `1` live, `2` alpha
 * `repositoryUrl`: Optional: your source repository URL
 * `status`: `1` not allow users to download the version, `2` make the version available for download
+* `strategy`: `add`  to add the build as a new build to even if it has the same build number (default), `replace` to replace to a build with the same build number
 * `tags`: Optional: restrict download to comma-separated list of tags
 * `teamCityLog`: `true` Add features for [TeamCity](http://www.jetbrains.com/teamcity/)
 * `teams`: Optional: restrict download to comma-separated list of team IDs; example teams 123, 213 with 123,213 being database ids of your teams
@@ -90,6 +91,7 @@ hockeyapp {
 * `variantToNotesType` : Optional: `[variantName: "0", variantName2: "1"]` map between your variants and notesType
 * `variantToReleaseType`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and releaseType
 * `variantToStatus`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and status
+* `variantToStrategy`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and strategy
 * `variantToTags`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and tags
 * `variantToNotify`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and notify
 
