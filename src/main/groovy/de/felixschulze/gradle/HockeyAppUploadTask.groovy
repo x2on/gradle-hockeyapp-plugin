@@ -61,7 +61,6 @@ class HockeyAppUploadTask extends DefaultTask {
     boolean mappingFileCouldBePresent = true
     HockeyAppPluginExtension hockeyApp
     String uploadAllPath
-    Object uploadResponse = null
 
 
     HockeyAppUploadTask() {
@@ -96,7 +95,8 @@ class HockeyAppUploadTask extends DefaultTask {
                 logger.debug('Mapping file not found')
                 mappingFileCouldBePresent = false
             }
-        } else {
+        }
+        else {
             logger.debug('Not using android application variants')
         }
 
@@ -144,7 +144,7 @@ class HockeyAppUploadTask extends DefaultTask {
         if (hockeyApp.variantToApplicationId) {
             appId = hockeyApp.variantToApplicationId[variantName]
             if (!appId) {
-                if (project.getGradle().getTaskGraph().hasTask(uploadAllPath)) {
+                if(project.getGradle().getTaskGraph().hasTask(uploadAllPath)) {
                     logger.error("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
                 } else {
                     throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
@@ -158,8 +158,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
     }
 
-    def void uploadFilesToHockeyApp(File appFile,
-                                    @Nullable File mappingFile, @Nullable String appId) {
+    def void uploadFilesToHockeyApp(File appFile, @Nullable File mappingFile, @Nullable String appId) {
 
         ProgressLoggerWrapper progressLogger = new ProgressLoggerWrapper(project, "Upload file to Hockey App");
 
@@ -210,7 +209,7 @@ class HockeyAppUploadTask extends DefaultTask {
 
             @Override
             public void progress(float progress) {
-                int progressInt = (int) progress
+                int progressInt = (int)progress
                 if (progressInt > lastProgress) {
                     lastProgress = progressInt
                     if (progressInt % 5 == 0) {
@@ -235,11 +234,12 @@ class HockeyAppUploadTask extends DefaultTask {
 
         if (response.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
             parseResponseAndThrowError(response)
-        } else {
+        }
+        else {
             logger.lifecycle("Application uploaded successfully.")
             if (response.getEntity() && response.getEntity().getContentLength() > 0) {
                 InputStreamReader reader = new InputStreamReader(response.getEntity().content)
-
+                def uploadResponse = null
                 try {
                     uploadResponse = new JsonSlurper().parse(reader)
                 }
@@ -264,6 +264,7 @@ class HockeyAppUploadTask extends DefaultTask {
         if (response.getEntity()?.getContentLength() > 0) {
             logger.debug("Response Content-Type: " + response.getFirstHeader("Content-type").getValue())
             InputStreamReader reader = new InputStreamReader(response.getEntity().content)
+            Object uploadResponse = null
             try {
                 uploadResponse = new JsonSlurper().parse(reader)
             } catch (Exception e) {
@@ -337,14 +338,14 @@ class HockeyAppUploadTask extends DefaultTask {
             entityBuilder.addPart("users", new StringBody(hockeyApp.users))
         }
         String mandatory = optionalProperty(hockeyApp.mandatory as String, hockeyApp.variantToMandatory)
-        if (mandatory) {
+        if (mandatory){
             entityBuilder.addPart("mandatory", new StringBody(mandatory))
         }
     }
 
     private String optionalProperty(String property, Map<String, String> variantToProperty) {
-        if (variantToProperty) {
-            if (variantToProperty[variantName]) {
+        if(variantToProperty) {
+            if(variantToProperty[variantName]) {
                 property = variantToProperty[variantName]
             }
         }
