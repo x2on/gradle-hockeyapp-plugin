@@ -61,7 +61,7 @@ class HockeyAppUploadTask extends DefaultTask {
     boolean mappingFileCouldBePresent = true
     HockeyAppPluginExtension hockeyApp
     String uploadAllPath
-
+    Object uploadResponse = null
 
     HockeyAppUploadTask() {
         super()
@@ -239,7 +239,7 @@ class HockeyAppUploadTask extends DefaultTask {
             logger.lifecycle("Application uploaded successfully.")
             if (response.getEntity() && response.getEntity().getContentLength() > 0) {
                 InputStreamReader reader = new InputStreamReader(response.getEntity().content)
-                def uploadResponse = null
+
                 try {
                     uploadResponse = new JsonSlurper().parse(reader)
                 }
@@ -264,7 +264,7 @@ class HockeyAppUploadTask extends DefaultTask {
         if (response.getEntity()?.getContentLength() > 0) {
             logger.debug("Response Content-Type: " + response.getFirstHeader("Content-type").getValue())
             InputStreamReader reader = new InputStreamReader(response.getEntity().content)
-            Object uploadResponse = null
+
             try {
                 uploadResponse = new JsonSlurper().parse(reader)
             } catch (Exception e) {
