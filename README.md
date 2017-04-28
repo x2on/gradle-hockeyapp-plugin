@@ -76,7 +76,7 @@ hockeyapp {
 * `notes`: Release notes as Textile or Markdown
 * `notesType`: `0` Textile, `1` Markdown
 * `notify`: `0` not notify testers, `1` notify all testers that can install this app
-* `releaseType`: `0` beta, `1` live, `2` alpha
+* `releaseType`: `0` beta, `1` live, `2` alpha, `3` enterprise
 * `repositoryUrl`: Optional: your source repository URL
 * `status`: `1` not allow users to download the version, `2` make the version available for download
 * `strategy`: `add`  to add the build as a new build to even if it has the same build number (default), `replace` to replace to a build with the same build number
