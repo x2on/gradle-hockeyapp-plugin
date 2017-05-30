@@ -47,6 +47,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Nullable
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.TaskAction
+import groovy.io.FileType
 
 /**
  * Upload task for plugin
@@ -78,13 +79,20 @@ class HockeyAppUploadTask extends DefaultTask {
         if (applicationVariant) {
             logger.debug('Using android application variants')
 
-            applicationVariant.outputs.each {
-                if (FilenameUtils.isExtension(it.outputFile.getName(), "apk")) {
-                    if (it.outputFile.exists()) {
-                        applicationFiles << it.outputFile
-                    } else {
-                        logger.debug("App file doesn't exist: $it.outputFile.absolutePath")
-                    }
+            def apks = []
+            project.buildDir.eachFileRecurse (FileType.FILES) { file ->
+                if (file.exists() && FilenameUtils.isExtension(file.getName(), "apk")) {
+                    apks << file
+                }
+            }
+
+            applicationVariant.outputs.each { variant ->
+                def variantApks = apks.findAll { it.getName().contains(variant.baseName) }
+
+                if(variantApks.size() > 0) {
+                    applicationFiles << variantApks.get(0)
+                } else {
+                    logger.debug("App file doesn't exist for variant: $variant.baseName")
                 }
             }
 

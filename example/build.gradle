@@ -2,11 +2,13 @@
 
 buildscript {
     repositories {
+        maven { url 'https://maven.google.com' }
         jcenter()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.1'
-        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.6'
+        classpath 'com.android.tools.build:gradle:3.0.0-alpha2'
+        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.7-SNAPSHOT'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -16,6 +18,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        maven { url 'https://maven.google.com' }
     }
 }
 
