@@ -36,7 +36,7 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'org.apache.httpcomponents:httpclient:4.5.1'
     compile 'org.apache.httpcomponents:httpmime:4.5.1'
-    compile 'com.android.tools.build:gradle:1.5.0'
+    compile 'com.android.tools.build:gradle:2.3.0'
     compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.2'
 
     testCompile 'junit:junit:4.12'
