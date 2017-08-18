@@ -76,6 +76,7 @@ hockeyapp {
 * `notes`: Release notes as Textile or Markdown
 * `notesType`: `0` Textile, `1` Markdown
 * `notify`: `0` not notify testers, `1` notify all testers that can install this app
+* `owner_id`: Optional: the ID of your organization
 * `releaseType`: `0` beta, `1` live, `2` alpha, `3` enterprise
 * `repositoryUrl`: Optional: your source repository URL
 * `status`: `1` not allow users to download the version, `2` make the version available for download
