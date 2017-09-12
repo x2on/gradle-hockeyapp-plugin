@@ -57,8 +57,8 @@ hockeyapp {
     notesType = 1
     notes = new File(file('../README.md').absolutePath).getText('UTF-8')
     variantToApplicationId = [
-            BuildVariantA:  "hockeyAppapplicationIdA",
-            BuildVariantB:  "hockeyAppapplicationIdB",
+            buildVariantA:  "hockeyAppApplicationIdA",
+            buildVariantB:  "hockeyAppApplicationIdB",
     ]
 }
 
@@ -77,15 +77,14 @@ hockeyapp {
 * `notesType`: `0` Textile, `1` Markdown
 * `notify`: `0` not notify testers, `1` notify all testers that can install this app
 * `owner_id`: Optional: the ID of your organization
-* `releaseType`: `0` beta, `1` live, `2` alpha, `3` enterprise
+* `releaseType`: `0` beta, `1` store, `2` alpha, `3` enterprise
 * `repositoryUrl`: Optional: your source repository URL
 * `status`: `1` not allow users to download the version, `2` make the version available for download
 * `strategy`: `add`  to add the build as a new build to even if it has the same build number (default), `replace` to replace to a build with the same build number
 * `tags`: Optional: restrict download to comma-separated list of tags
 * `teamCityLog`: `true` Add features for [TeamCity](http://www.jetbrains.com/teamcity/)
-* `teams`: Optional: restrict download to comma-separated list of team IDs; example teams 123, 213 with 123,213 being database ids of your teams
-* `users`: Optional: restrict download to comma-separated list of user IDs; example:
-					users=1224,5678 with 1224 and 5678 being the database IDs of your users
+* `teams`: Optional: restrict download to comma-separated list of team IDs; example: `teams = '123,213'` with 123 and 213 being database IDs of your teams
+* `users`: Optional: restrict download to comma-separated list of user IDs; example: `users = '1224,5678'` with 1224 and 5678 being the database IDs of your users
 * `variantToApiToken`: Optional: `[variantName: "YOURHOCKEYAPITOKEN", variantName2: "YOUROTHERHOCKEYAPITOKEN"]` map between your variants and api tokens
 * `variantToApplicationId`:  Optional (Android): `[variantName: "hockeyAppAppId", variantName2: "hockeyAppAppId2"]` map between your variants and HockeyApp application IDs
 * `variantToMandatory`: Optional: `[variantName: "0", variantName2: "1"]` map between your variants and mandatory
