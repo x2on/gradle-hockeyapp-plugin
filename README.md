@@ -105,11 +105,11 @@ hockeyapp {
 
 ## Migration from 2.x to >= 3.0
 
-To migrate to version >= 3.0 please change 
+To migrate to version >= 3.0 please change
 ```gradle
 apply plugin: 'hockeyApp'
 ```
-to 
+to
 ```gradle
 apply plugin: 'de.felixschulze.gradle.hockeyapp'
 ```

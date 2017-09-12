@@ -17,9 +17,9 @@
     <ruleset-ref path="rulesets/dry.xml"/>
     <ruleset-ref path="rulesets/exceptions.xml"/>
     <ruleset-ref path="rulesets/formatting.xml">
-    	<exclude name="BlankLineBeforePackage"/>
-    	<exclude name="LineLength"/>
-    	<exclude name="SpaceAroundMapEntryColon"/>
+        <exclude name="BlankLineBeforePackage"/>
+        <exclude name="LineLength"/>
+        <exclude name="SpaceAroundMapEntryColon"/>
     </ruleset-ref>
     <ruleset-ref path="rulesets/generic.xml"/>
     <ruleset-ref path="rulesets/groovyism.xml"/>
