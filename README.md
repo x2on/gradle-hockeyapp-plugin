@@ -96,6 +96,7 @@ hockeyapp {
 * `variantToStrategy`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and strategy
 * `variantToTags`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and tags
 * `variantToNotify`: Optional: `[variantName: "1", variantName2: "2"]` map between your variants and notify
+* `updateExisting`: Optional: `true` try to update existing version
 
 
 ### iOS or custom Android build only options
