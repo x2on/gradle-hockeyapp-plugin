@@ -38,15 +38,19 @@ import org.apache.http.HttpResponse
 import org.apache.http.HttpStatus
 import org.apache.http.client.HttpClient
 import org.apache.http.client.config.RequestConfig
+import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.methods.HttpPut
+import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.entity.mime.MultipartEntityBuilder
 import org.apache.http.entity.mime.content.FileBody
 import org.apache.http.entity.mime.content.StringBody
 import org.apache.http.impl.client.HttpClientBuilder
 import org.gradle.api.DefaultTask
-import org.gradle.api.Nullable
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.TaskAction
+
+import javax.annotation.Nullable
 
 /**
  * Upload task for plugin
@@ -61,7 +65,6 @@ class HockeyAppUploadTask extends DefaultTask {
     boolean mappingFileCouldBePresent = true
     HockeyAppPluginExtension hockeyApp
     String uploadAllPath
-    Object uploadResponse = null
 
     HockeyAppUploadTask() {
         super()
@@ -69,6 +72,7 @@ class HockeyAppUploadTask extends DefaultTask {
     }
 
 
+    @SuppressWarnings("GroovyUnusedDeclaration")
     @TaskAction
     def upload() throws IOException {
 
@@ -95,8 +99,7 @@ class HockeyAppUploadTask extends DefaultTask {
                 logger.debug('Mapping file not found')
                 mappingFileCouldBePresent = false
             }
-        }
-        else {
+        } else {
             logger.debug('Not using android application variants')
         }
 
@@ -109,11 +112,12 @@ class HockeyAppUploadTask extends DefaultTask {
                 throw new IllegalArgumentException("No appFileNameRegex provided.")
             }
             if (!hockeyApp.outputDirectory || !hockeyApp.outputDirectory.exists()) {
-                throw new IllegalArgumentException("The outputDirectory (" + hockeyApp.outputDirectory ? hockeyApp.outputDirectory.absolutePath : " not defined " + ") doesn't exists")
+                String s = hockeyApp.outputDirectory ? hockeyApp.outputDirectory.absolutePath : " not defined "
+                throw new IllegalArgumentException("The outputDirectory ($s) doesn't exists")
             }
-            applicationFiles = FileHelper.getFiles(hockeyApp.appFileNameRegex, hockeyApp.outputDirectory);
+            applicationFiles = FileHelper.getFiles(hockeyApp.appFileNameRegex, hockeyApp.outputDirectory)
             if (!applicationFiles) {
-                throw new IllegalStateException("No app file found in directory " + hockeyApp.outputDirectory.absolutePath)
+                throw new IllegalStateException("No app file found in directory ${hockeyApp.outputDirectory.absolutePath}")
             }
         }
 
@@ -129,7 +133,7 @@ class HockeyAppUploadTask extends DefaultTask {
         // Requires it to be set in the project config
         if (mappingFileCouldBePresent && !mappingFile && hockeyApp.symbolsDirectory?.exists()) {
             symbolsDirectory = hockeyApp.symbolsDirectory
-            mappingFile = FileHelper.getFile(hockeyApp.mappingFileNameRegex, symbolsDirectory);
+            mappingFile = FileHelper.getFile(hockeyApp.mappingFileNameRegex, symbolsDirectory)
 
             if (!mappingFile) {
                 logger.warn("No Mapping file found.")
@@ -137,59 +141,141 @@ class HockeyAppUploadTask extends DefaultTask {
         }
 
         if (mappingFile?.exists()) {
-            logger.lifecycle("Mapping file: " + mappingFile.absolutePath)
+            logger.lifecycle("Mapping file: ${mappingFile.absolutePath}")
         }
 
         String appId = null
         if (hockeyApp.variantToApplicationId) {
             appId = hockeyApp.variantToApplicationId[variantName]
             if (!appId) {
-                if(project.getGradle().getTaskGraph().hasTask(uploadAllPath)) {
-                    logger.error("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
+                if (project.getGradle().getTaskGraph().hasTask(uploadAllPath)) {
+                    logger.error("Could not resolve app ID for variant: ${variantName} in the " +
+                            "variantToApplicationId map.")
                 } else {
-                    throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the variantToApplicationId map.")
+                    throw new IllegalArgumentException("Could not resolve app ID for variant: ${variantName} in the " +
+                            "variantToApplicationId map.")
                 }
             }
         }
 
         applicationFiles.each {
-            uploadFilesToHockeyApp(it, mappingFile, appId)
+            boolean existingVersionUpdated = false
+            if (hockeyApp.updateExisting) {
+                existingVersionUpdated = tryUpdateExistingVersion(it, mappingFile, appId)
+            }
+
+            if (!existingVersionUpdated) {
+                uploadFilesToHockeyApp(it, mappingFile, appId, null)
+            }
         }
 
     }
 
-    def void uploadFilesToHockeyApp(File appFile, @Nullable File mappingFile, @Nullable String appId) {
-
-        ProgressLoggerWrapper progressLogger = new ProgressLoggerWrapper(project, "Upload file to Hockey App");
+    /**
+     *
+     * @param appFile
+     * @param mappingFile
+     * @param appId
+     * @return true when version with given version name and code exists and was successfully updated </br>
+     * false otherwise.
+     */
+    boolean tryUpdateExistingVersion(File appFile, @Nullable File mappingFile, @Nullable String appId) {
+        ProgressLoggerWrapper progressLogger = new ProgressLoggerWrapper(project,
+                "Update existing version in Hockey App")
 
         progressLogger.started()
         if (hockeyApp.teamCityLog) {
-            println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.START, "Upload file to Hockey App")
+            println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.START,
+                    "Update existing version in Hockey App")
         }
 
-        RequestConfig.Builder requestBuilder = RequestConfig.custom()
-        requestBuilder = requestBuilder.setConnectTimeout(hockeyApp.timeout)
-        requestBuilder = requestBuilder.setConnectionRequestTimeout(hockeyApp.timeout)
+        HttpClient httpClient = getHttpClient()
 
-        String proxyHost = System.getProperty("http.proxyHost", "")
-        int proxyPort = System.getProperty("http.proxyPort", "0") as int
-        if (proxyHost.length() > 0 && proxyPort > 0) {
-            logger.lifecycle("Using proxy: " + proxyHost + ":" + proxyPort)
-            HttpHost proxy = new HttpHost(proxyHost, proxyPort);
-            requestBuilder = requestBuilder.setProxy(proxy)
-        }
-
-        HttpClientBuilder builder = HttpClientBuilder.create();
-        builder.setDefaultRequestConfig(requestBuilder.build());
-        HttpClient httpClient = builder.build();
-
-        String uploadUrl = hockeyApp.hockeyApiUrl
+        String versionsUrl = hockeyApp.hockeyApiUrl
         if (appId) {
-            uploadUrl = "${hockeyApp.hockeyApiUrl}/${appId}/app_versions/upload"
+            versionsUrl = "${hockeyApp.hockeyApiUrl}/${appId}/app_versions"
         }
 
-        HttpPost httpPost = new HttpPost(uploadUrl)
-        logger.info("Will upload to: ${uploadUrl}")
+        HttpGet httpGet = new HttpGet(versionsUrl)
+        logger.info("Going to ask for existing version from: ${versionsUrl}")
+
+        httpGet.addHeader("X-HockeyAppToken", getApiToken())
+        logger.info("Request: ${httpGet.getRequestLine().toString()}")
+        HttpResponse response = httpClient.execute(httpGet)
+        logger.debug("Response status code: ${response.getStatusLine().getStatusCode()}")
+        boolean returnValue = false
+        if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+            parseResponseAndThrowError(response)
+        } else {
+            logger.lifecycle("Versions fetched successfully.")
+            if (response.getEntity() &&
+                    (response.getEntity().getContentLength() > 0 || response.getEntity().isStreaming())) {
+                InputStreamReader reader = new InputStreamReader(response.getEntity().content)
+
+                def versionsResponse = null
+                try {
+                    versionsResponse = new JsonSlurper().parse(reader)
+                }
+                catch (Exception e) {
+                    logger.error("Error while parsing JSON response: ${e.toString()}")
+                }
+                reader.close()
+                if (versionsResponse && versionsResponse.status == 'success') {
+                    def versionInfo = null
+                    for (iter in versionsResponse.app_versions) {
+                        boolean versionCodeMatches = (iter.version?.toInteger() == project.versionCode)
+                        boolean versionNameMatches = (iter.shortversion?.toString() == project.versionName)
+                        if (versionCodeMatches && versionNameMatches) {
+                            versionInfo = iter
+                            break
+                        }
+                    }
+
+                    if (versionInfo) {
+                        logger.info("Found version to update: Title: '${versionInfo.title}' " +
+                                "Config url: '${versionInfo.config_url}'")
+                        logger.debug("Found version info: ${versionInfo.toString()}")
+                        logger.lifecycle("Gonna try to update config url ${versionInfo.config_url}")
+
+                        HttpPut httpPut = new HttpPut("$versionsUrl/${versionInfo.id}")
+                        uploadFilesToHockeyApp(appFile, mappingFile, appId, httpPut)
+                        returnValue = true
+                    }
+                }
+            }
+            if (hockeyApp.teamCityLog) {
+                println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.FINISH,
+                        "Application uploaded successfully.")
+            }
+            progressLogger.completed()
+        }
+        returnValue
+    }
+
+    void uploadFilesToHockeyApp(File appFile,
+                                @Nullable File mappingFile,
+                                @Nullable String appId,
+                                @Nullable HttpUriRequest httpRequest) {
+
+        ProgressLoggerWrapper progressLogger = new ProgressLoggerWrapper(project, "Upload file to Hockey App")
+
+        progressLogger.started()
+        if (hockeyApp.teamCityLog) {
+            println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.START,
+                    "Upload file to Hockey App")
+        }
+
+        HttpClient httpClient = getHttpClient()
+
+        if (!httpRequest) {
+            String uploadUrl = hockeyApp.hockeyApiUrl
+            if (appId) {
+                uploadUrl = "${hockeyApp.hockeyApiUrl}/${appId}/app_versions/upload"
+            }
+
+            httpRequest = new HttpPost(uploadUrl)
+            logger.info("Will upload to: ${uploadUrl}")
+        }
 
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create()
 
@@ -199,7 +285,7 @@ class HockeyAppUploadTask extends DefaultTask {
         }
         decorateWithOptionalProperties(entityBuilder)
 
-        httpPost.addHeader("X-HockeyAppToken", getApiToken())
+        httpRequest.addHeader("X-HockeyAppToken", getApiToken())
 
 
         int lastProgress = 0
@@ -208,15 +294,16 @@ class HockeyAppUploadTask extends DefaultTask {
         ProgressHttpEntityWrapper.ProgressCallback progressCallback = new ProgressHttpEntityWrapper.ProgressCallback() {
 
             @Override
-            public void progress(float progress) {
-                int progressInt = (int)progress
+            void progress(float progress) {
+                int progressInt = (int) progress
                 if (progressInt > lastProgress) {
                     lastProgress = progressInt
                     if (progressInt % 5 == 0) {
-                        progressLogger.progress(progressInt + "% uploaded")
-                        loggerForCallback.info(progressInt + "% uploaded")
+                        progressLogger.progress("${progressInt}% uploaded")
+                        loggerForCallback.info("${progressInt}% uploaded")
                         if (teamCityLog) {
-                            println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.MESSAGE, progressInt + "% uploaded")
+                            println TeamCityStatusMessageHelper.buildProgressString(
+                                    TeamCityProgressType.MESSAGE, "${progressInt}% uploaded")
                         }
                     }
                 }
@@ -224,64 +311,93 @@ class HockeyAppUploadTask extends DefaultTask {
 
         }
 
-        httpPost.setEntity(new ProgressHttpEntityWrapper(entityBuilder.build(), progressCallback));
+        httpRequest.setEntity(new ProgressHttpEntityWrapper(entityBuilder.build(), progressCallback))
 
-        logger.info("Request: " + httpPost.getRequestLine().toString())
+        logger.info("Request: ${httpRequest.getRequestLine()}")
 
-        HttpResponse response = httpClient.execute(httpPost)
+        HttpResponse response = httpClient.execute(httpRequest)
 
-        logger.debug("Response status code: " + response.getStatusLine().getStatusCode())
+        logger.debug("Response status code: ${response.getStatusLine().getStatusCode()}")
 
         if (response.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
             parseResponseAndThrowError(response)
-        }
-        else {
+        } else {
             logger.lifecycle("Application uploaded successfully.")
             if (response.getEntity() && response.getEntity().getContentLength() > 0) {
-                InputStreamReader reader = new InputStreamReader(response.getEntity().content)
-
-                try {
-                    uploadResponse = new JsonSlurper().parse(reader)
-                }
-                catch (Exception e) {
-                    logger.error("Error while parsing JSON response: " + e.toString())
-                }
-                reader.close()
-                if (uploadResponse) {
-                    logger.info("Upload information: Title: '" + uploadResponse.title?.toString() + "' Config url: '" + uploadResponse.config_url?.toString()) + "'";
-                    logger.debug("Upload response: " + uploadResponse.toString())
-                    logger.lifecycle("Application public url " + uploadResponse.public_url?.toString())
+                def responseContent = extractResponseContent(response)
+                if (responseContent) {
+                    logger.info("Upload information: Title: '${responseContent.title}' Config url: " +
+                            "'${responseContent.config_url}'")
+                    logger.debug("Upload response: ${responseContent.toString()}")
+                    logger.lifecycle("Application public url ${responseContent.public_url}")
                 }
             }
             if (hockeyApp.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.FINISH, "Application uploaded successfully.")
+                println TeamCityStatusMessageHelper.buildProgressString(TeamCityProgressType.FINISH,
+                        "Application uploaded successfully.")
             }
             progressLogger.completed()
         }
     }
 
+    private HttpClient getHttpClient() {
+        RequestConfig.Builder requestBuilder = RequestConfig.custom()
+        requestBuilder = requestBuilder.setConnectTimeout(hockeyApp.timeout)
+        requestBuilder = requestBuilder.setConnectionRequestTimeout(hockeyApp.timeout)
+
+        String proxyHost = System.getProperty("http.proxyHost", "")
+        int proxyPort = System.getProperty("http.proxyPort", "0") as int
+        if (proxyHost.length() > 0 && proxyPort > 0) {
+            logger.lifecycle("Using proxy: ${proxyHost}:${proxyPort}")
+            HttpHost proxy = new HttpHost(proxyHost, proxyPort)
+            requestBuilder = requestBuilder.setProxy(proxy)
+        }
+
+        HttpClientBuilder builder = HttpClientBuilder.create()
+        builder.setDefaultRequestConfig(requestBuilder.build())
+        builder.build()
+    }
+
+    private Object extractResponseContent(HttpResponse httpResponse) {
+        Object responseContent = null
+        if (!httpResponse) {
+            return responseContent
+        }
+
+        if (!httpResponse.entity) {
+            return responseContent
+        }
+
+        if (!(httpResponse.entity.contentLength > 0 || httpResponse.entity.isStreaming)) {
+            return responseContent
+        }
+
+        InputStreamReader reader = new InputStreamReader(httpResponse.entity.content)
+        try {
+            responseContent = new JsonSlurper().parse(reader)
+        } catch (Exception e) {
+            logger.error("Error while parsing JSON response: ${e.toString()}")
+        }
+        reader.close()
+        return responseContent
+    }
+
     private void parseResponseAndThrowError(HttpResponse response) {
         if (response.getEntity()?.getContentLength() > 0) {
-            logger.debug("Response Content-Type: " + response.getFirstHeader("Content-type").getValue())
-            InputStreamReader reader = new InputStreamReader(response.getEntity().content)
+            logger.debug("Response Content-Type: ${response.getFirstHeader("Content-type").getValue()}")
+            def responseContent = extractResponseContent(response)
 
-            try {
-                uploadResponse = new JsonSlurper().parse(reader)
-            } catch (Exception e) {
-                logger.debug("Error while parsing JSON response: " + e.toString())
-            }
-            reader.close()
+            if (responseContent) {
+                logger.debug("Upload response: ${responseContent.toString()}")
 
-            if (uploadResponse) {
-                logger.debug("Upload response: " + uploadResponse.toString())
-
-                if (uploadResponse.status && uploadResponse.status.equals("error") && uploadResponse.message) {
-                    logger.error("Error response from HockeyApp: " + uploadResponse.message.toString())
-                    throw new IllegalStateException("File upload failed: " + uploadResponse.message.toString() + " - Status: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase())
+                if (responseContent.status && responseContent.status == 'error' && responseContent.message) {
+                    logger.error("Error response from HockeyApp: ${responseContent.message.toString()}")
+                    throw new IllegalStateException("File upload failed: ${responseContent.message.toString()} - Status:" +
+                            " ${response.getStatusLine().getStatusCode()}  ${response.getStatusLine().getReasonPhrase()}")
                 }
-                if (uploadResponse.errors?.credentials) {
-                    if (uploadResponse.errors.credentials instanceof ArrayList) {
-                        ArrayList credentialsError = uploadResponse.errors.credentials;
+                if (responseContent.errors?.credentials) {
+                    if (responseContent.errors.credentials instanceof ArrayList) {
+                        ArrayList credentialsError = responseContent.errors.credentials
                         if (!credentialsError.isEmpty()) {
                             logger.error(credentialsError.get(0).toString())
                             throw new IllegalStateException(credentialsError.get(0).toString())
@@ -290,7 +406,8 @@ class HockeyAppUploadTask extends DefaultTask {
                 }
             }
         }
-        throw new IllegalStateException("File upload failed: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
+        throw new IllegalStateException("File upload failed: ${response.getStatusLine().getStatusCode()} " +
+                response.getStatusLine().getReasonPhrase())
     }
 
     private void decorateWithOptionalProperties(MultipartEntityBuilder entityBuilder) {
@@ -341,14 +458,14 @@ class HockeyAppUploadTask extends DefaultTask {
             entityBuilder.addPart("users", new StringBody(hockeyApp.users))
         }
         String mandatory = optionalProperty(hockeyApp.mandatory as String, hockeyApp.variantToMandatory)
-        if (mandatory){
+        if (mandatory) {
             entityBuilder.addPart("mandatory", new StringBody(mandatory))
         }
     }
 
     private String optionalProperty(String property, Map<String, String> variantToProperty) {
-        if(variantToProperty) {
-            if(variantToProperty[variantName]) {
+        if (variantToProperty) {
+            if (variantToProperty[variantName]) {
                 property = variantToProperty[variantName]
             }
         }
