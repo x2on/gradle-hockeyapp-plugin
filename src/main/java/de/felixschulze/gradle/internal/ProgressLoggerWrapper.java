@@ -30,7 +30,7 @@ import org.gradle.api.logging.Logger;
 public class ProgressLoggerWrapper {
     private final Logger logger;
     private final Object progressLogger;
-    
+
     /**
      * Create a progress logger wrapper
      * @param project the current Gradle project
@@ -48,10 +48,10 @@ public class ProgressLoggerWrapper {
             throws ClassNotFoundException, NoSuchMethodException,
                 InvocationTargetException, IllegalAccessException {
         logger = project.getLogger();
-        
+
         //we are about to access an internal class. Use reflection here to provide
         //as much compatibility to different Gradle versions as possible
-        
+
         //get ProgressLoggerFactory class
         Class<?> progressLoggerFactoryClass;
         try {
@@ -63,20 +63,20 @@ public class ProgressLoggerWrapper {
             progressLoggerFactoryClass = Class.forName(
                     "org.gradle.logging.ProgressLoggerFactory");
         }
-        
+
         //get ProgressLoggerFactory service
         Object serviceFactory = invoke(project, "getServices");
         Object progressLoggerFactory = invoke(serviceFactory, "get",
                 progressLoggerFactoryClass);
-        
+
         //get actual progress logger
         progressLogger = invoke(progressLoggerFactory, "newOperation", getClass());
-        
+
         //configure progress logger
         invoke(progressLogger, "setDescription", desc);
         invoke(progressLogger, "setLoggingHeader", desc);
     }
-    
+
     /**
      * Invoke a method using reflection
      * @param obj the object whose method should be invoked
@@ -98,7 +98,7 @@ public class ProgressLoggerWrapper {
         m.setAccessible(true);
         return m.invoke(obj, args);
     }
-    
+
     /**
      * Invoke a method using reflection but don't throw any exceptions.
      * Just log errors instead.
@@ -118,21 +118,21 @@ public class ProgressLoggerWrapper {
             logger.trace("Unable to log progress", e);
         }
     }
-    
+
     /**
      * Start on operation
      */
     public void started() {
         invokeIgnoreExceptions(progressLogger, "started");
     }
-    
+
     /**
      * Complete an operation
      */
     public void completed() {
         invokeIgnoreExceptions(progressLogger, "completed");
     }
-    
+
     /**
      * Set the current operation's progress
      * @param msg the progress message

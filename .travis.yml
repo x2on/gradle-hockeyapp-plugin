@@ -1,12 +1,1 @@
 language: groovy
-
-sudo: false
-
-install: ./gradlew clean test assemble
-
-branches:
-  only:
-    - master
-    
-env:
-   - TERM=dumb
