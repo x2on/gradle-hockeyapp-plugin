@@ -302,7 +302,12 @@ class HockeyAppUploadTask extends DefaultTask {
         if (notesType) {
             entityBuilder.addPart("notes_type", new StringBody(notesType))
         }
-        String notes = optionalProperty(hockeyApp.notes, hockeyApp.variantToNotes)
+        String notes
+        if (project.hasProperty("notes")) {
+            notes = project.property("notes").toString()
+        } else {
+            notes = optionalProperty(hockeyApp.notes, hockeyApp.variantToNotes)
+        }
         if (notes) {
             entityBuilder.addPart("notes", new StringBody(notes, Consts.UTF_8))
         }
